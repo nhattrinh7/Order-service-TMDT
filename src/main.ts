@@ -24,8 +24,8 @@ async function bootstrap() {
       exchange: 'events_exchange',
       exchangeType: 'topic',
       wildcards: true,
-      queue: 'inventory_queue',
-      consumerTag: 'inventory_consumer',
+      queue: 'order_queue',
+      consumerTag: 'order_consumer',
       queueOptions: {
         durable: true, // queue được persist để ko mất khi restart
         exclusive: false, // nhiều consumer có thể consume queue này
@@ -38,7 +38,7 @@ async function bootstrap() {
 
   await app.startAllMicroservices()
 
-  await app.listen(env.config.PORT ?? 3007)
+  await app.listen(env.config.PORT ?? 3008)
 }
 
 // eslint-disable-next-line no-console

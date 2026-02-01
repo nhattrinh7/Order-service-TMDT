@@ -3,9 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
 import { RabbitMQPublisher } from '~/infrastructure/messaging/publishers/rabbitmq.publisher'
 import { CqrsModule } from '@nestjs/cqrs'
-import { ProductCreatedConsumer } from '~/infrastructure/messaging/consumers/product-created.consumer'
-import { ProductUpdatedConsumer } from '~/infrastructure/messaging/consumers/product-updated.consumer'
-import { GetStocksConsumer } from '~/infrastructure/messaging/consumers/get-stocks.consumer'
+
 
 @Module({
   imports: [
@@ -20,12 +18,28 @@ import { GetStocksConsumer } from '~/infrastructure/messaging/consumers/get-stoc
           persistent: true,
         },
       },
+      {
+        name: 'USER_CLIENT',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:admin123@localhost:5672'],
+          queue: 'user_queue',
+          persistent: true,
+        },
+      },
+      {
+        name: 'SHOP_CLIENT',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:admin123@localhost:5672'],
+          queue: 'shop_queue',
+          persistent: true,
+        },
+      },
     ]),
   ],
   controllers: [
-    ProductCreatedConsumer,
-    ProductUpdatedConsumer,
-    GetStocksConsumer
+    
   ],
   providers: [
     {
