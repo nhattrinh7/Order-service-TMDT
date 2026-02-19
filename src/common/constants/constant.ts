@@ -1,0 +1,1 @@
+export const SHIPPING_FEE_PER_SHOP = 500

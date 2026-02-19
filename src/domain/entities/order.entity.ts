@@ -1,6 +1,6 @@
 import { AggregateRoot } from '@nestjs/cqrs'
 import { v4 as uuidv4 } from 'uuid'
-import { OrderStatus } from '~/domain/enums/order.enum'
+import { OrderStatus, OrderPaymentMethod } from '~/domain/enums/order.enum'
 
 export class Order extends AggregateRoot {
   constructor(
@@ -9,7 +9,10 @@ export class Order extends AggregateRoot {
     public userId: string,
     public shopId: string,
     public status: OrderStatus,
-    public shippingAddressId: string,
+    public paymentMethod: OrderPaymentMethod,
+    public shippingAddress: string,
+    public receiverName: string,
+    public receiverPhoneNumber: string,
     public subtotal: number,
     public shippingFee: number,
     public szoneVoucherDiscount: number,

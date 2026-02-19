@@ -12,6 +12,7 @@ import { CqrsModule } from '@nestjs/cqrs'
       provide: ORDER_REPOSITORY,
       useClass: OrderRepository,
     },
+    
   ],
   exports: [
     ORDER_REPOSITORY,

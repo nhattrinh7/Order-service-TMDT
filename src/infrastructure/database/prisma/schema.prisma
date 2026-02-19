@@ -10,47 +10,100 @@ datasource db {
 }
 
 enum OrderStatus {
+  PENDING_PAYMENT
   AWAITING_CONFIRMATION
   PREPARING
   SHIPPING
   COMPLETED
   CANCELLED
+  RETURNED // chắc mình ko làm cái trả hàng hoàn tiền này
+  PAYMENT_FAILED
+}
+// COD: AWAITING_CONFIRMATION ngay
+// Online - thành công: PENDING_PAYMENT → thanh toán OK → AWAITING_CONFIRMATION
+// Online - thất bại: PENDING_PAYMENT → thanh toán thất bại → CANCELLED
+// COD thì shipper giao hàng và thu tiền hộ thành công + người mua nhấn đã nhận dc hàng (hoặc timeout 3 ngày)
+// mới chuyển status sang COMPLETED, thanh toán online thì shipper giao 
+// thành công và người mua nhấn đã nhận dc hàng (hoặc timeout 3 ngày) là đã ok r và chuyển sang COMPLETED dc rồi
+
+enum OrderPaymentMethod {
+  COD
+  WALLET
+  QRCODE
 }
 
 model Order {
   id                   String      @id @default(uuid()) @db.Uuid
-  paymentId            String?     @map("payment_id") @db.Uuid
-  userId               String      @map("user_id") @db.Uuid
-  shopId               String      @map("shop_id") @db.Uuid
-  status               OrderStatus @default(AWAITING_CONFIRMATION)
-  shippingAddressId    String      @map("shipping_address_id") @db.Uuid
-  subtotal             Int         // Tổng tiền chưa giảm giá
-  shippingFee          Int         @map("shipping_fee")
-  szoneVoucherDiscount Int         @default(0) @map("szone_voucher_discount")
-  shopVoucherDiscount  Int         @default(0) @map("shop_voucher_discount")
-  finalPrice           Int         @map("final_price")
-  createdAt            DateTime    @default(now()) @map("created_at")
-  updatedAt            DateTime    @updatedAt @map("updated_at")
+  // paymentId có giá trị khi đơn hàng thanh toán QRCODE thành công, không có giá trị khi
+  // người dùng chọn thanh toán COD hoặc WALLET
+  paymentId            String?             @map("payment_id") @db.Uuid
+  userId               String              @map("user_id") @db.Uuid
+  shopId               String              @map("shop_id") @db.Uuid
+  status               OrderStatus         @default(AWAITING_CONFIRMATION)
+  paymentMethod        OrderPaymentMethod  @map("payment_method")
+  shippingAddress      String              @map("shipping_address")
+  receiverName         String              @map("receiver_name")
+  receiverPhoneNumber  String              @map("receiver_phone_number")
+  subtotal             Int                 // Tổng tiền chưa giảm giá
+  shippingFee          Int                 @map("shipping_fee") // Cố định là 1000
+  szoneVoucherDiscount Int                 @default(0) @map("szone_voucher_discount")
+  shopVoucherDiscount  Int                 @default(0) @map("shop_voucher_discount")
+  finalPrice           Int                 @map("final_price")
+  createdAt            DateTime            @default(now()) @map("created_at")
+  updatedAt            DateTime            @updatedAt @map("updated_at")
 
-  orderDetails OrderDetail[]
+  orderItems OrderItem[]
+  settlement Settlement?
 
   @@map("orders")
 }
 
-model OrderDetail {
+model OrderItem {
   id               String  @id @default(uuid()) @db.Uuid
   orderId          String  @map("order_id") @db.Uuid
   productId        String  @map("product_id") @db.Uuid
   productVariantId String  @map("product_variant_id") @db.Uuid
   productName      String  @map("product_name")
-  productImage     String  @map("product_image") @db.Text
+  variantImage     String  @map("variant_image") @db.Text
   sku              String  // Nâu-XL
   quantity         Int
-  price            Int     // Giá 1 đơn vị tại thời điểm mua (đã tính vouchers)
+  finalPrice       Int     // Giá 1 đơn vị tại thời điểm mua (đã tính vouchers)
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  @@map("order_details")
+  @@map("order_items")
+}
+
+// Sau khi shipper giao hàng thành công sẽ tạo bản ghi Settlement, shipper giao thành công sẽ gửi api chứa orderId lên BE
+// dùng orderId này để lấy ra bản ghi Order và dùng dữ liệu từ bản ghi Order này để tạo bản ghi Settlement
+// goodsPrice = finalPrice của Order
+// commissionFee = finalPrice * 5%
+// payout = finalPrice - commissionFee
+model Settlement {
+  id                String        @id @default(uuid()) @db.Uuid
+  orderId           String        @unique @map("order_id") @db.Uuid
+  shopId            String        @map("shop_id") @db.Uuid
+  goodsPrice        Int           @map("goods_price")
+  commissionFee     Int           @map("commission_fee")
+  payout            Int
+  paymentMethod     PaymentMethod @default(WALLET) @map("payment_method")
+  status            PayoutStatus  @default(PENDING)
+  payoutAt          DateTime?     @map("payout_at") @db.Timestamptz
+  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("settlements")
+}
+
+enum PaymentMethod {
+  WALLET
+}
+
+enum PayoutStatus {
+  PENDING    // Chưa cộng vào ví seller
+  COMPLETED  // Đã cộng vào ví seller
 }
 
 model TransitWarehouse {

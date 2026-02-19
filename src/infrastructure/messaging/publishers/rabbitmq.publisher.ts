@@ -12,6 +12,10 @@ export class RabbitMQPublisher implements IMessagePublisher {
     private readonly shopClient: ClientProxy,
     @Inject('USER_CLIENT') 
     private readonly userClient: ClientProxy,
+    @Inject('CATALOG_CLIENT')
+    private readonly catalogClient: ClientProxy,
+    @Inject('VOUCHER_CLIENT')
+    private readonly voucherClient: ClientProxy,
   ) {}
 
   publish<T>(pattern: string, event: T): void {
@@ -25,6 +29,16 @@ export class RabbitMQPublisher implements IMessagePublisher {
 
   async sendToShopService<T, R = any>(pattern: string, data: T): Promise<R> {
     const response$ = this.shopClient.send<R, T>(pattern, data)
+    return lastValueFrom(response$)
+  }
+
+  async sendToCatalogService<T, R = any>(pattern: string, data: T): Promise<R> {
+    const response$ = this.catalogClient.send<R, T>(pattern, data)
+    return lastValueFrom(response$)
+  }
+
+  async sendToVoucherService<T, R = any>(pattern: string, data: T): Promise<R> {
+    const response$ = this.voucherClient.send<R, T>(pattern, data)
     return lastValueFrom(response$)
   }
 }

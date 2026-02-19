@@ -1,5 +1,5 @@
 
-import { Order as PrismaOrder} from '@prisma/client'
+import { Order as PrismaOrder, OrderStatus as PrismaOrderStatus, OrderPaymentMethod as PrismaOrderPaymentMethod } from '@prisma/client'
 import { Order } from '~/domain/entities/order.entity'
 
 export class OrderMapper {
@@ -10,7 +10,10 @@ export class OrderMapper {
       prismaOrder.userId,
       prismaOrder.shopId,
       prismaOrder.status,
-      prismaOrder.shippingAddressId,
+      prismaOrder.paymentMethod,
+      prismaOrder.shippingAddress,
+      prismaOrder.receiverName,
+      prismaOrder.receiverPhoneNumber,
       prismaOrder.subtotal,
       prismaOrder.shippingFee,
       prismaOrder.szoneVoucherDiscount,
@@ -27,9 +30,12 @@ export class OrderMapper {
       paymentId: order.paymentId,
       userId: order.userId,
       shopId: order.shopId,
-      status: order.status,
-      shippingAddressId: order.shippingAddressId,
-      subtotal: order.subtotal,
+      status: order.status as PrismaOrderStatus,
+      paymentMethod: order.paymentMethod as PrismaOrderPaymentMethod,
+      shippingAddress: order.shippingAddress,
+      receiverName: order.receiverName,
+      receiverPhoneNumber: order.receiverPhoneNumber,
+      subtotal: order.subtotal, 
       shippingFee: order.shippingFee,
       szoneVoucherDiscount: order.szoneVoucherDiscount,
       shopVoucherDiscount: order.shopVoucherDiscount,
