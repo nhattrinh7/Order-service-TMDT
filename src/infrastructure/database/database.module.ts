@@ -15,6 +15,7 @@ import { CqrsModule } from '@nestjs/cqrs'
     
   ],
   exports: [
+    PrismaService,
     ORDER_REPOSITORY,
   ],
 })

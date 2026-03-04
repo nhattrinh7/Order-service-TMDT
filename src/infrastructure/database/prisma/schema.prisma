@@ -15,9 +15,9 @@ enum OrderStatus {
   PREPARING
   SHIPPING
   COMPLETED
-  CANCELLED
+  CANCELLED // luồng ko thành công ở đoạn nào đó khác đoạn payment, hoặc đặt hàng rồi mà buyer sau đó hủy đơn
   RETURNED // chắc mình ko làm cái trả hàng hoàn tiền này
-  PAYMENT_FAILED
+  PAYMENT_FAILED // saga step mà fail đúng đoạn thanh toán thì mới chọn status này
 }
 // COD: AWAITING_CONFIRMATION ngay
 // Online - thành công: PENDING_PAYMENT → thanh toán OK → AWAITING_CONFIRMATION

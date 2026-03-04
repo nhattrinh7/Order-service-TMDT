@@ -32,7 +32,6 @@ export class OrderController {
     @Body() body: CalculatePriceRequestDto,
     @Headers('x-user-id') userId: string,
   ) {
-    console.log('userId', userId)
     const result = await this.commandBus.execute(
       new CalculatePriceCommand(
         body.itemsByShop,

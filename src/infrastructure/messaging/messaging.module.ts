@@ -3,6 +3,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
 import { RabbitMQPublisher } from '~/infrastructure/messaging/publishers/rabbitmq.publisher'
 import { CqrsModule } from '@nestjs/cqrs'
+import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-order.consumer'
 
 
 @Module({
@@ -54,10 +55,19 @@ import { CqrsModule } from '@nestjs/cqrs'
           persistent: true,
         },
       },
+      {
+        name: 'SAGA_CLIENT',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:admin123@localhost:5672'],
+          queue: 'saga_queue',
+          persistent: true,
+        },
+      },
     ]),
   ],
   controllers: [
-    
+    SagaOrderConsumer,
   ],
   providers: [
     {
