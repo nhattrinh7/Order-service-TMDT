@@ -50,13 +50,18 @@ export class OrderRepository implements IOrderRepository {
     return result.count
   }
 
-  async updateStatus(orderId: string, status: OrderStatus): Promise<void> {
+  async updateStatus(orderId: string, status: OrderStatus, cancelReason?: string): Promise<void> {
+    const data: any = {
+      status: status as unknown as PrismaOrderStatus,
+      updatedAt: new Date(),
+    }
+    if (cancelReason !== undefined) {
+      data.cancelReason = cancelReason
+    }
+
     await this.prisma.order.update({
       where: { id: orderId },
-      data: {
-        status: status as unknown as PrismaOrderStatus,
-        updatedAt: new Date(),
-      },
+      data,
     })
   }
 

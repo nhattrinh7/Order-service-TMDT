@@ -17,6 +17,8 @@ export const OrderSchema = z.object({
   szoneVoucherDiscount: z.number().min(0),
   shopVoucherDiscount: z.number().min(0),
   finalPrice: z.number().min(0),
+  cancelReason: z.string().nullable(),
+  returnReason: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })

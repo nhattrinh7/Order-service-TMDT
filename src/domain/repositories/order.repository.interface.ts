@@ -25,7 +25,7 @@ export interface IOrderRepository {
 
   updateManyStatus(orderIds: string[], status: OrderStatus, tx?: any): Promise<number>
 
-  updateStatus(orderId: string, status: OrderStatus): Promise<void>
+  updateStatus(orderId: string, status: OrderStatus, cancelReason?: string): Promise<void>
 
   findById(orderId: string): Promise<Order | null>
 

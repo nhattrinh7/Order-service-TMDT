@@ -6,7 +6,7 @@ generator client {
 // trong env khi prisma đã start lên, những chỗ chưa start thì chịu
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL") 
+  url      = env("DATABASE_URL")
 }
 
 enum OrderStatus {
@@ -21,6 +21,7 @@ enum OrderStatus {
   RETURNED // chắc mình ko làm cái trả hàng hoàn tiền này
   PAYMENT_FAILED // saga step mà fail đúng đoạn thanh toán thì mới chọn status này
 }
+
 // COD: AWAITING_CONFIRMATION ngay
 // Online - thành công: PENDING_PAYMENT → thanh toán OK → AWAITING_CONFIRMATION
 // Online - thất bại: PENDING_PAYMENT → thanh toán thất bại → PAYMENT_FAILED
@@ -35,41 +36,43 @@ enum OrderPaymentMethod {
 }
 
 model Order {
-  id                   String      @id @default(uuid()) @db.Uuid
+  id                   String             @id @default(uuid()) @db.Uuid
   // paymentId có giá trị khi đơn hàng thanh toán QRCODE thành công, không có giá trị khi
   // người dùng chọn thanh toán COD hoặc WALLET
-  paymentId            String?             @map("payment_id") @db.Uuid
-  userId               String              @map("user_id") @db.Uuid
-  shopId               String              @map("shop_id") @db.Uuid
-  status               OrderStatus         @default(AWAITING_CONFIRMATION)
-  paymentMethod        OrderPaymentMethod  @map("payment_method")
-  shippingAddress      String              @map("shipping_address")
-  receiverName         String              @map("receiver_name")
-  receiverPhoneNumber  String              @map("receiver_phone_number")
-  subtotal             Int                 // Tổng tiền chưa giảm giá
-  shippingFee          Int                 @map("shipping_fee") // Cố định là 1000
-  szoneVoucherDiscount Int                 @default(0) @map("szone_voucher_discount")
-  shopVoucherDiscount  Int                 @default(0) @map("shop_voucher_discount")
-  finalPrice           Int                 @map("final_price")
-  createdAt            DateTime            @default(now()) @map("created_at")
-  updatedAt            DateTime            @updatedAt @map("updated_at")
+  paymentId            String?            @map("payment_id") @db.Uuid
+  userId               String             @map("user_id") @db.Uuid
+  shopId               String             @map("shop_id") @db.Uuid
+  status               OrderStatus        @default(AWAITING_CONFIRMATION)
+  paymentMethod        OrderPaymentMethod @map("payment_method")
+  shippingAddress      String             @map("shipping_address")
+  receiverName         String             @map("receiver_name")
+  receiverPhoneNumber  String             @map("receiver_phone_number")
+  subtotal             Int // Tổng tiền chưa giảm giá
+  shippingFee          Int                @map("shipping_fee") // Cố định là 1000
+  szoneVoucherDiscount Int                @default(0) @map("szone_voucher_discount")
+  shopVoucherDiscount  Int                @default(0) @map("shop_voucher_discount")
+  finalPrice           Int                @map("final_price")
+  cancelReason         String?            @map("cancel_reason") @db.Text
+  returnReason         String?            @map("return_reason") @db.Text
+  createdAt            DateTime           @default(now()) @map("created_at")
+  updatedAt            DateTime           @updatedAt @map("updated_at")
 
   orderItems OrderItem[]
   settlement Settlement?
 
   @@map("orders")
-} 
+}
 
 model OrderItem {
-  id               String  @id @default(uuid()) @db.Uuid
-  orderId          String  @map("order_id") @db.Uuid
-  productId        String  @map("product_id") @db.Uuid
-  productVariantId String  @map("product_variant_id") @db.Uuid
-  productName      String  @map("product_name")
-  variantImage     String  @map("variant_image") @db.Text
-  sku              String  // Nâu-XL
+  id               String @id @default(uuid()) @db.Uuid
+  orderId          String @map("order_id") @db.Uuid
+  productId        String @map("product_id") @db.Uuid
+  productVariantId String @map("product_variant_id") @db.Uuid
+  productName      String @map("product_name")
+  variantImage     String @map("variant_image") @db.Text
+  sku              String // Nâu-XL
   quantity         Int
-  finalPrice       Int     // Giá 1 đơn vị tại thời điểm mua (đã tính vouchers)
+  finalPrice       Int // Giá 1 đơn vị tại thời điểm mua (đã tính vouchers)
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
@@ -82,17 +85,17 @@ model OrderItem {
 // commissionFee = finalPrice * 5%
 // payout = finalPrice - commissionFee
 model Settlement {
-  id                String        @id @default(uuid()) @db.Uuid
-  orderId           String        @unique @map("order_id") @db.Uuid
-  shopId            String        @map("shop_id") @db.Uuid
-  goodsPrice        Int           @map("goods_price")
-  commissionFee     Int           @map("commission_fee")
-  payout            Int
-  paymentMethod     PaymentMethod @default(WALLET) @map("payment_method")
-  status            PayoutStatus  @default(PENDING)
-  payoutAt          DateTime?     @map("payout_at") @db.Timestamptz
-  createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz
-  updatedAt         DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+  id            String        @id @default(uuid()) @db.Uuid
+  orderId       String        @unique @map("order_id") @db.Uuid
+  shopId        String        @map("shop_id") @db.Uuid
+  goodsPrice    Int           @map("goods_price")
+  commissionFee Int           @map("commission_fee")
+  payout        Int
+  paymentMethod PaymentMethod @default(WALLET) @map("payment_method")
+  status        PayoutStatus  @default(PENDING)
+  payoutAt      DateTime?     @map("payout_at") @db.Timestamptz
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamptz
 
   order Order @relation(fields: [orderId], references: [id])
 
@@ -104,26 +107,25 @@ enum PaymentMethod {
 }
 
 enum PayoutStatus {
-  PENDING    // Chưa cộng vào ví seller
-  COMPLETED  // Đã cộng vào ví seller
+  PENDING // Chưa cộng vào ví seller
+  COMPLETED // Đã cộng vào ví seller
 }
 
 model TransitWarehouse {
-  id        String   @id @default(uuid()) @db.Uuid
-  scannerId String   @map("scanner_id") @db.Uuid
-  name      String   @db.VarChar(255)
-  address   String   @db.Text
+  id        String @id @default(uuid()) @db.Uuid
+  scannerId String @map("scanner_id") @db.Uuid
+  name      String @db.VarChar(255)
+  address   String @db.Text
 
   @@map("transit_warehouses")
 }
 
 model OrderDeliveryHistory {
-  id                String   @id @default(uuid()) @db.Uuid
-  orderId           String   @map("order_id") @db.Uuid
-  warehouses        Json?    @map("warehouse_history")
-  shipper           Json?
+  id         String @id @default(uuid()) @db.Uuid
+  orderId    String @map("order_id") @db.Uuid
+  warehouses Json?  @map("warehouse_history")
+  shipper    Json?
 }
-
 
 // {
 //   id: uuid
@@ -205,4 +207,3 @@ model OrderDeliveryHistory {
 //     },
 //   }
 // }
-

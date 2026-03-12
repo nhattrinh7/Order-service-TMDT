@@ -13,6 +13,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { CalculatePriceRequestDto } from '~/presentation/dtos/calculate-price.dto'
 import { CalculatePriceCommand } from '~/application/commands/calculate-price/calculate-price.command'
 import { CancelOrderCommand } from '~/application/commands/cancel-order/cancel-order.command'
+import { CancelOrderDto } from '~/presentation/dtos/cancel-order.dto'
 import { GetUserOrdersQuery } from '~/application/queries/get-user-orders/get-user-orders.query'
 import { GetUserOrdersQueryDto } from '~/presentation/dtos/get-user-orders.dto'
 
@@ -54,9 +55,10 @@ export class OrderController {
   async cancelOrder(
     @Param('orderId', ParseUUIDPipe) orderId: string,
     @Headers('x-user-id') userId: string,
+    @Body() body: CancelOrderDto,
   ) {
     return this.commandBus.execute(
-      new CancelOrderCommand(orderId, userId),
+      new CancelOrderCommand(orderId, userId, body.cancelReason),
     )
   }
 

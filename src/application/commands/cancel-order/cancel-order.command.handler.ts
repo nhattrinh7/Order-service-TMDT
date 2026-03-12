@@ -22,7 +22,7 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
   ) {}
 
   async execute(command: CancelOrderCommand) {
-    const { orderId, userId } = command
+    const { orderId, userId, cancelReason } = command
 
     // 1. Tìm đơn hàng
     const order = await this.orderRepository.findById(orderId)
@@ -42,8 +42,8 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
       )
     }
 
-    // 4. Cập nhật trạng thái sang CANCELLED
-    await this.orderRepository.updateStatus(orderId, OrderStatus.CANCELLED)
+    // 4. Cập nhật trạng thái sang CANCELLED và lưu lý do
+    await this.orderRepository.updateStatus(orderId, OrderStatus.CANCELLED, cancelReason)
 
     // 5. Hoàn tiền vào ví nếu đơn đã thanh toán online (QRCODE hoặc WALLET)
     if (

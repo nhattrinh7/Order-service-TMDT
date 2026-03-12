@@ -18,6 +18,8 @@ export class OrderMapper {
       szoneVoucherDiscount: order.szoneVoucherDiscount,
       shopVoucherDiscount: order.shopVoucherDiscount,
       finalPrice: order.finalPrice,
+      cancelReason: order.cancelReason,
+      returnReason: order.returnReason,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
     } 
