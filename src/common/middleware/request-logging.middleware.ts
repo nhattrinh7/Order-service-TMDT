@@ -11,6 +11,8 @@ export class RequestLoggingMiddleware implements NestMiddleware {
     const kongRequestId = (req.headers['kong-request-id'] as string) || uuidv4()
     const startTime = Date.now()
 
+    // ở đây ko phải middleware đợi responnse, không phải middleware chạy được cả chiều response
+    // mà là nó đăng kí 1 móc câu vào object res. Khi response hoàn tất thì sẽ chạy
     res.on('finish', () => {
       const duration = Date.now() - startTime
       const { method, originalUrl } = req

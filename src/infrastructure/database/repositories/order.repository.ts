@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '~/infrastructure/database/prisma/prisma.service'
-import { IOrderRepository } from '~/domain/repositories/order.repository.interface'
+import { IOrderRepository, OrderWithItems } from '~/domain/repositories/order.repository.interface'
 import { Order } from '~/domain/entities/order.entity'
 import { OrderMapper } from '~/infrastructure/database/mappers/order.mapper'
 import { OrderStatus } from '~/domain/enums/order.enum'
@@ -48,5 +48,72 @@ export class OrderRepository implements IOrderRepository {
     })
 
     return result.count
+  }
+
+  async updateStatus(orderId: string, status: OrderStatus): Promise<void> {
+    await this.prisma.order.update({
+      where: { id: orderId },
+      data: {
+        status: status as unknown as PrismaOrderStatus,
+        updatedAt: new Date(),
+      },
+    })
+  }
+
+  async findById(orderId: string): Promise<Order | null> {
+    const prismaOrder = await this.prisma.order.findUnique({
+      where: { id: orderId },
+    })
+
+    if (!prismaOrder) return null
+
+    return OrderMapper.toDomain(prismaOrder)
+  }
+
+  async findByUserIdPaginated(
+    userId: string,
+    status: OrderStatus,
+    cursorTimestamp?: Date,
+    cursorId?: string,
+    limit: number = 10,
+  ): Promise<OrderWithItems[]> {
+    const where: any = {
+      userId,
+      status: status as unknown as PrismaOrderStatus,
+    }
+
+    // Compound cursor: lấy các đơn cũ hơn cursor (createdAt, id)
+    if (cursorTimestamp && cursorId) {
+      where.OR = [
+        { createdAt: { lt: cursorTimestamp } },
+        { createdAt: cursorTimestamp, id: { lt: cursorId } },
+      ]
+    }
+
+    const orders = await this.prisma.order.findMany({
+      where,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      take: limit,
+      include: { orderItems: true },
+    })
+
+    return orders.map(order => ({
+      id: order.id,
+      shopId: order.shopId,
+      status: order.status,
+      paymentMethod: order.paymentMethod,
+      finalPrice: order.finalPrice,
+      createdAt: order.createdAt,
+      orderItems: order.orderItems.map(item => ({
+        id: item.id,
+        productId: item.productId,
+        productVariantId: item.productVariantId,
+        productName: item.productName,
+        variantImage: item.variantImage,
+        sku: item.sku,
+        quantity: item.quantity,
+        finalPrice: item.finalPrice,
+      })),
+    }))
   }
 }

@@ -3,12 +3,18 @@ import {
   Controller,
   Get,
   Param,
+  Patch,
+  ParseUUIDPipe,
   Post,
+  Query,
   Headers,
 } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { CalculatePriceRequestDto } from '~/presentation/dtos/calculate-price.dto'
 import { CalculatePriceCommand } from '~/application/commands/calculate-price/calculate-price.command'
+import { CancelOrderCommand } from '~/application/commands/cancel-order/cancel-order.command'
+import { GetUserOrdersQuery } from '~/application/queries/get-user-orders/get-user-orders.query'
+import { GetUserOrdersQueryDto } from '~/presentation/dtos/get-user-orders.dto'
 
 @Controller('v1/orders')
 export class OrderController {
@@ -16,16 +22,16 @@ export class OrderController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
-
-  // @Get(':id/shipper')
-  // async getOrderToShipper(
-  //   @Param('id') orderId: string,
-  //   @Body() body: { name: string; phoneNumber: string },
-  // ) {
-  //   const result = await this.queryBus.execute(new GetOrderToShipperQuery(orderId, body))
-
-  //   return { message: 'Get order to shipper successful', data: result }
-  // }
+  
+  @Get('users/:userId')
+  async getUserOrders(
+    @Param('userId', ParseUUIDPipe) userId: string,
+    @Query() query: GetUserOrdersQueryDto,
+  ) {
+    return this.queryBus.execute(
+      new GetUserOrdersQuery(userId, query.status, query.cursor, query.limit),
+    )
+  }
 
   @Post('calculate-price')
   async calculatePrice(
@@ -43,4 +49,15 @@ export class OrderController {
 
     return result
   }
+
+  @Patch(':orderId/cancel')
+  async cancelOrder(
+    @Param('orderId', ParseUUIDPipe) orderId: string,
+    @Headers('x-user-id') userId: string,
+  ) {
+    return this.commandBus.execute(
+      new CancelOrderCommand(orderId, userId),
+    )
+  }
+
 }

@@ -1,6 +1,7 @@
 
 import { Order as PrismaOrder, OrderStatus as PrismaOrderStatus, OrderPaymentMethod as PrismaOrderPaymentMethod } from '@prisma/client'
 import { Order } from '~/domain/entities/order.entity'
+import { OrderStatus, OrderPaymentMethod } from '~/domain/enums/order.enum'
 
 export class OrderMapper {
   static toDomain(prismaOrder: PrismaOrder): Order {
@@ -9,8 +10,8 @@ export class OrderMapper {
       prismaOrder.paymentId,
       prismaOrder.userId,
       prismaOrder.shopId,
-      prismaOrder.status,
-      prismaOrder.paymentMethod,
+      prismaOrder.status as OrderStatus,
+      prismaOrder.paymentMethod as OrderPaymentMethod,
       prismaOrder.shippingAddress,
       prismaOrder.receiverName,
       prismaOrder.receiverPhoneNumber,

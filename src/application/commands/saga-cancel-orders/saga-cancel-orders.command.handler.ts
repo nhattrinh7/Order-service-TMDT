@@ -21,7 +21,7 @@ export class SagaCancelOrdersHandler implements ICommandHandler<SagaCancelOrders
 
     const updatedCount = await this.orderRepository.updateManyStatus(
       orderIds,
-      (status as OrderStatus) || OrderStatus.CANCELLED,
+      (status as OrderStatus) || OrderStatus.ORDER_FAILED,
     )
 
     this.logger.log(`SagaCancelOrdersHandler: ${updatedCount} orders updated to ${status}`)

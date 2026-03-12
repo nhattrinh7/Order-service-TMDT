@@ -14,17 +14,19 @@ enum OrderStatus {
   AWAITING_CONFIRMATION
   PREPARING
   SHIPPING
-  COMPLETED
-  CANCELLED // luồng ko thành công ở đoạn nào đó khác đoạn payment, hoặc đặt hàng rồi mà buyer sau đó hủy đơn
+  DELIVERY_COMPLETED
+  DELIVERY_FAILED
+  ORDER_FAILED // luồng ko thành công ở đoạn nào đó khác đoạn payment
+  CANCELLED // đặt hàng rồi mà buyer sau đó hủy đơn
   RETURNED // chắc mình ko làm cái trả hàng hoàn tiền này
   PAYMENT_FAILED // saga step mà fail đúng đoạn thanh toán thì mới chọn status này
 }
 // COD: AWAITING_CONFIRMATION ngay
 // Online - thành công: PENDING_PAYMENT → thanh toán OK → AWAITING_CONFIRMATION
-// Online - thất bại: PENDING_PAYMENT → thanh toán thất bại → CANCELLED
+// Online - thất bại: PENDING_PAYMENT → thanh toán thất bại → PAYMENT_FAILED
 // COD thì shipper giao hàng và thu tiền hộ thành công + người mua nhấn đã nhận dc hàng (hoặc timeout 3 ngày)
-// mới chuyển status sang COMPLETED, thanh toán online thì shipper giao 
-// thành công và người mua nhấn đã nhận dc hàng (hoặc timeout 3 ngày) là đã ok r và chuyển sang COMPLETED dc rồi
+// mới chuyển status sang DELIVERY_COMPLETED, thanh toán online thì shipper giao 
+// thành công và người mua nhấn đã nhận dc hàng (hoặc timeout 3 ngày) là đã ok r và chuyển sang DELIVERY_COMPLETED dc rồi
 
 enum OrderPaymentMethod {
   COD
@@ -56,7 +58,7 @@ model Order {
   settlement Settlement?
 
   @@map("orders")
-}
+} 
 
 model OrderItem {
   id               String  @id @default(uuid()) @db.Uuid
@@ -108,6 +110,7 @@ enum PayoutStatus {
 
 model TransitWarehouse {
   id        String   @id @default(uuid()) @db.Uuid
+  scannerId String   @map("scanner_id") @db.Uuid
   name      String   @db.VarChar(255)
   address   String   @db.Text
 
@@ -121,81 +124,85 @@ model OrderDeliveryHistory {
   shipper           Json?
 }
 
-/*
-  {
-    id: uuid
-    orderId: uuid
-    warehouses: Json: [
-      {
-        "name": "Kho Trung Trực",
-        "address": "Số 15 Hoàng Cầu, Đông Anh, Hà Nội",
-        "time": "2026-01-20T08:30:00Z",
-      },
-      {
-        "name": "Kho Nguyễn Trãi",
-        "address": "Số 3 Tiên Quang, Gia Lâm, Hà Nội",
-        "time": "2026-01-21T09:15:00Z",
-      }
-    ],
-    shipper: Json: { 
-      "name": "Lê Trung Đức", 
-      "phoneNumber": "0982134546", 
-      "time": "2026-01-21T09:15:00Z",
-    }
-  }
 
-  {
-    orderId: uuid
-    success: false
-  }
+// {
+//   id: uuid
+//   orderId: uuid
+//   warehouses: Json: [
+//     {
+//       "name": "Kho Trung Trực",
+//       "address": "Số 15 Hoàng Cầu, Đông Anh, Hà Nội",
+//       "time": "2026-01-20T08:30:00Z",
+//     },
+//     {
+//       "name": "Kho Nguyễn Trãi",
+//       "address": "Số 3 Tiên Quang, Gia Lâm, Hà Nội",
+//       "time": "2026-01-21T09:15:00Z",
+//     }
+//   ],
+//   shipper: Json: { 
+//     "name": "Lê Trung Đức", 
+//     "phoneNumber": "0982134546", 
+//     "time": "2026-01-21T09:15:00Z",
+//   }
+// }
 
-  {
-    orderId: uuid
-    warehouse: {
-      name: string
-      address: string
-    }
-  }
-*/
-/*
-}
-  success: true
-  message: "Get order to shipper successfully"
-  data: {
-    order: {
-      id: "",
-      user: {
-        id: "",
-        name: "",
-        phoneNumber: "",
-        shippingAddress: "Số 7, đường Phan Chu Trinh, Hai Bà Trưng, Hà Nội",
-      },
-      shop: {
-        id: "",
-        name: "",
-        phoneNumber: "",
-        shopAddress: "Số 7, đường Phan Chu Trinh, Hai Bà Trưng, Hà Nội",
-      },
-      shippingFee: 15000,
-      price: 390000 hoặc 0 nếu đã thanh toán,
-      productList: [
-        {
-          name: "Áo thun Silomon tay cộc",
-          sku: "nâu-XL",
-          quantity: 2,
-        },
-        {
-          name: "Áo thun Silomon tay cộc",
-          sku: "xanh-L",
-          quantity: 1,
-        },
-        {
-          name: "Quần âu May 10 form đứng",
-          sku: "đen-XL",
-          quantity: 1,
-        },
-      ],
-    },
-  }
-}
-*/
+// {
+//   name: string,
+//   phoneNumber: string,
+// }
+
+// {
+//   orderId: uuid
+//   success: true
+// }
+
+// {
+//   orderId: uuid
+//   warehouse: {
+//     name: string
+//     address: string
+//   }
+// }
+
+// }
+//   success: true
+//   message: "Get order to shipper successfully"
+//   data: {
+//     order: {
+//       id: "",
+//       user: {
+//         id: "",
+//         name: "",
+//         phoneNumber: "",
+//         shippingAddress: "Số 7, đường Phan Chu Trinh, Hai Bà Trưng, Hà Nội",
+//       },
+//       shop: {
+//         id: "",
+//         name: "",
+//         phoneNumber: "",
+//         shopAddress: "Số 7, đường Phan Chu Trinh, Hai Bà Trưng, Hà Nội",
+//       },
+//       shippingFee: 15000,
+//       price: 390000 (hoặc 0 nếu đã thanh toán),
+//       productList: [
+//         {
+//           name: "Áo thun Silomon tay cộc",
+//           sku: "nâu-XL",
+//           quantity: 2,
+//         },
+//         {
+//           name: "Áo thun Silomon tay cộc",
+//           sku: "xanh-L",
+//           quantity: 1,
+//         },
+//         {
+//           name: "Quần âu May 10 form đứng",
+//           sku: "đen-XL",
+//           quantity: 1,
+//         },
+//       ],
+//     },
+//   }
+// }
+
