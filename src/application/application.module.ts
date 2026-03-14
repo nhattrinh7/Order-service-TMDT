@@ -10,6 +10,7 @@ import { CancelOrderHandler } from './commands/cancel-order/cancel-order.command
 import { AcceptOrderHandler } from './commands/accept-order/accept-order.command.handler'
 import { GetUserOrdersHandler } from './queries/get-user-orders/get-user-orders.query.handler'
 import { GetShopOrdersHandler } from './queries/get-shop-orders/get-shop-orders.query.handler'
+import { DispatchOrderHandler } from './commands/dispatch-order/dispatch-order.command.handler'
 
 const CommandHandlers = [
   CalculatePriceHandler,
@@ -18,6 +19,7 @@ const CommandHandlers = [
   SagaUpdateOrdersStatusHandler,
   CancelOrderHandler,
   AcceptOrderHandler,
+  DispatchOrderHandler,
 ]
 
 const QueryHandlers = [

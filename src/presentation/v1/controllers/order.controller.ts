@@ -14,6 +14,7 @@ import { CalculatePriceRequestDto } from '~/presentation/dtos/calculate-price.dt
 import { CalculatePriceCommand } from '~/application/commands/calculate-price/calculate-price.command'
 import { CancelOrderCommand } from '~/application/commands/cancel-order/cancel-order.command'
 import { AcceptOrderCommand } from '~/application/commands/accept-order/accept-order.command'
+import { DispatchOrderCommand } from '~/application/commands/dispatch-order/dispatch-order.command'
 import { CancelOrderDto } from '~/presentation/dtos/cancel-order.dto'
 import { GetUserOrdersQuery } from '~/application/queries/get-user-orders/get-user-orders.query'
 import { GetUserOrdersQueryDto } from '~/presentation/dtos/get-user-orders.dto'
@@ -75,6 +76,18 @@ export class OrderController {
     )
 
     return { message: 'Xác nhận đơn hàng thành công' }
+  }
+
+  @Patch(':orderId/dispatch-to-carrier')
+  async dispatchOrderToCarrier(
+    @Param('orderId', ParseUUIDPipe) orderId: string,
+    @Headers('x-user-id') userId: string,
+  ) {
+    await this.commandBus.execute(
+      new DispatchOrderCommand(orderId, userId),
+    )
+
+    return { message: 'Đã cập nhật trạng thái giao đơn vị vận chuyển' }
   }
 
   @Get('shop/:shopId')
