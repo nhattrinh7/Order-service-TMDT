@@ -13,9 +13,12 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { CalculatePriceRequestDto } from '~/presentation/dtos/calculate-price.dto'
 import { CalculatePriceCommand } from '~/application/commands/calculate-price/calculate-price.command'
 import { CancelOrderCommand } from '~/application/commands/cancel-order/cancel-order.command'
+import { AcceptOrderCommand } from '~/application/commands/accept-order/accept-order.command'
 import { CancelOrderDto } from '~/presentation/dtos/cancel-order.dto'
 import { GetUserOrdersQuery } from '~/application/queries/get-user-orders/get-user-orders.query'
 import { GetUserOrdersQueryDto } from '~/presentation/dtos/get-user-orders.dto'
+import { GetShopOrdersQuery } from '~/application/queries/get-shop-orders/get-shop-orders.query'
+import { GetShopOrdersQueryDto } from '~/presentation/dtos/get-shop-orders.dto'
 
 @Controller('v1/orders')
 export class OrderController {
@@ -62,4 +65,31 @@ export class OrderController {
     )
   }
 
+  @Patch(':orderId/accept')
+  async acceptOrder(
+    @Param('orderId', ParseUUIDPipe) orderId: string,
+    @Headers('x-user-id') userId: string,
+  ) {
+    await this.commandBus.execute(
+      new AcceptOrderCommand(orderId, userId),
+    )
+
+    return { message: 'Xác nhận đơn hàng thành công' }
+  }
+
+  @Get('shop/:shopId')
+  async getShopOrders(
+    @Param('shopId', ParseUUIDPipe) shopId: string,
+    @Query() query: GetShopOrdersQueryDto,
+  ) {
+    return this.queryBus.execute(
+      new GetShopOrdersQuery(
+        shopId,
+        query.page,
+        query.limit,
+        query.status,
+        query.search,
+      ),
+    )
+  }
 }

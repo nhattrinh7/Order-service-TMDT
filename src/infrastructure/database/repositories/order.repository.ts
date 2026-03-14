@@ -102,12 +102,123 @@ export class OrderRepository implements IOrderRepository {
       include: { orderItems: true },
     })
 
-    return orders.map(order => ({
+    return orders.map((order: any) => ({
       id: order.id,
+      userId: order.userId,
       shopId: order.shopId,
       status: order.status,
       paymentMethod: order.paymentMethod,
       finalPrice: order.finalPrice,
+      shippingAddress: order.shippingAddress,
+      receiverName: order.receiverName,
+      receiverPhoneNumber: order.receiverPhoneNumber,
+      subtotal: order.subtotal,
+      shippingFee: order.shippingFee,
+      szoneVoucherDiscount: order.szoneVoucherDiscount,
+      shopVoucherDiscount: order.shopVoucherDiscount,
+      cancelReason: order.cancelReason,
+      returnReason: order.returnReason,
+      createdAt: order.createdAt,
+      orderItems: order.orderItems.map(item => ({
+        id: item.id,
+        productId: item.productId,
+        productVariantId: item.productVariantId,
+        productName: item.productName,
+        variantImage: item.variantImage,
+        sku: item.sku,
+        quantity: item.quantity,
+        finalPrice: item.finalPrice,
+      })),
+    }))
+  }
+
+  async countByShopId(shopId: string, status: OrderStatus, search?: string): Promise<number> {
+    const where: any = {
+      shopId,
+      status: status as unknown as PrismaOrderStatus,
+    }
+
+    if (search) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(search)
+      
+      where.OR = []
+      
+      if (isUuid) {
+        where.OR.push({ id: search })
+      }
+      
+      where.OR.push({
+        orderItems: {
+          some: {
+            productName: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        },
+      })
+    }
+
+    return this.prisma.order.count({ where })
+  }
+
+  async findByShopIdPaginated(
+    shopId: string,
+    status: OrderStatus,
+    skip: number,
+    take: number,
+    search?: string,
+  ): Promise<OrderWithItems[]> {
+    const where: any = {
+      shopId,
+      status: status as unknown as PrismaOrderStatus,
+    }
+
+    if (search) {
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(search)
+      
+      where.OR = []
+
+      if (isUuid) {
+        where.OR.push({ id: search })
+      }
+      
+      where.OR.push({
+        orderItems: {
+          some: {
+            productName: {
+              contains: search,
+              mode: 'insensitive',
+            },
+          },
+        },
+      })
+    }
+
+    const orders = await this.prisma.order.findMany({
+      where,
+      orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+      skip,
+      take,
+      include: { orderItems: true },
+    })
+
+    return orders.map((order: any) => ({
+      id: order.id,
+      userId: order.userId,
+      shopId: order.shopId,
+      status: order.status,
+      paymentMethod: order.paymentMethod,
+      finalPrice: order.finalPrice,
+      shippingAddress: order.shippingAddress,
+      receiverName: order.receiverName,
+      receiverPhoneNumber: order.receiverPhoneNumber,
+      subtotal: order.subtotal,
+      shippingFee: order.shippingFee,
+      szoneVoucherDiscount: order.szoneVoucherDiscount,
+      shopVoucherDiscount: order.shopVoucherDiscount,
+      cancelReason: order.cancelReason,
+      returnReason: order.returnReason,
       createdAt: order.createdAt,
       orderItems: order.orderItems.map(item => ({
         id: item.id,

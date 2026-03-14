@@ -7,7 +7,9 @@ import { SagaCreateOrdersHandler } from './commands/saga-create-orders/saga-crea
 import { SagaCancelOrdersHandler } from './commands/saga-cancel-orders/saga-cancel-orders.command.handler'
 import { SagaUpdateOrdersStatusHandler } from './commands/saga-update-orders-status/saga-update-orders-status.command.handler'
 import { CancelOrderHandler } from './commands/cancel-order/cancel-order.command.handler'
+import { AcceptOrderHandler } from './commands/accept-order/accept-order.command.handler'
 import { GetUserOrdersHandler } from './queries/get-user-orders/get-user-orders.query.handler'
+import { GetShopOrdersHandler } from './queries/get-shop-orders/get-shop-orders.query.handler'
 
 const CommandHandlers = [
   CalculatePriceHandler,
@@ -15,10 +17,12 @@ const CommandHandlers = [
   SagaCancelOrdersHandler,
   SagaUpdateOrdersStatusHandler,
   CancelOrderHandler,
+  AcceptOrderHandler,
 ]
 
 const QueryHandlers = [
   GetUserOrdersHandler,
+  GetShopOrdersHandler,
 ]
 
 const EventHandlers = [
