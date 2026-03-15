@@ -9,6 +9,7 @@ export class SagaCreateOrdersCommand {
       shippingFee: number
       shopVoucherDiscount: number
       szoneVoucherDiscount: number
+      goodsPrice: number
       finalPrice: number
       paymentMethod: string
       paymentId?: string

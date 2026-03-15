@@ -17,6 +17,7 @@ export class OrderMapper {
       shippingFee: order.shippingFee,
       szoneVoucherDiscount: order.szoneVoucherDiscount,
       shopVoucherDiscount: order.shopVoucherDiscount,
+      goodsPrice: order.goodsPrice,
       finalPrice: order.finalPrice,
       cancelReason: order.cancelReason,
       returnReason: order.returnReason,

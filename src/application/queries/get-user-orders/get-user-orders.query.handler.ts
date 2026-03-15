@@ -24,6 +24,7 @@ interface OrderResponse {
   shopName: string
   status: string
   paymentMethod: string
+  goodsPrice: number
   finalPrice: number
   createdAt: Date
   orderItems: OrderItemResponse[]
@@ -85,6 +86,7 @@ export class GetUserOrdersHandler implements IQueryHandler<GetUserOrdersQuery> {
         shopName: shopInfo?.name || `Shop ${order.shopId.slice(0, 6)}`,
         status: order.status,
         paymentMethod: order.paymentMethod,
+        goodsPrice: order.goodsPrice,
         finalPrice: order.finalPrice,
         createdAt: order.createdAt,
         orderItems: order.orderItems.map(item => ({

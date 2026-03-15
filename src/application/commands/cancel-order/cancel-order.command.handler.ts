@@ -52,7 +52,7 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
     ) {
       this.messagePublisher.emitToUserService('refund.wallet', {
         userId: order.userId,
-        amount: order.finalPrice,
+        amount: order.goodsPrice,
       })
     }
 

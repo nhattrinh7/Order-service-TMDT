@@ -51,6 +51,10 @@ model Order {
   shippingFee          Int                @map("shipping_fee") // Cố định là 1000
   szoneVoucherDiscount Int                @default(0) @map("szone_voucher_discount")
   shopVoucherDiscount  Int                @default(0) @map("shop_voucher_discount")
+  // nên có 1 trường thể hiện giá của đơn hàng ko bao gồm phí ship. khi giao đơn cho người mua cũng rành mạch
+  // khoản nào hàng khoản nào ship. nếu ko nhận hàng thì vẫn biết ship bao nhiêu để trả ship. rồi khi người mua
+  // trả hàng hoàn tiền thì cũng là hoàn khoản tiền của hàng chứ ko hoàn cả phí ship.
+  goodsPrice           Int                @map("goods_price")
   finalPrice           Int                @map("final_price")
   cancelReason         String?            @map("cancel_reason") @db.Text
   returnReason         String?            @map("return_reason") @db.Text
@@ -173,10 +177,9 @@ model OrderDeliveryHistory {
 //   data: {
 //     order: {
 //       id: "",
-//       user: {
-//         id: "",
-//         name: "",
-//         phoneNumber: "",
+//       recipient: {
+//         name: "", // recipientName
+//         phoneNumber: "", // recipientPhoneNumber
 //         shippingAddress: "Số 7, đường Phan Chu Trinh, Hai Bà Trưng, Hà Nội",
 //       },
 //       shop: {
@@ -185,8 +188,7 @@ model OrderDeliveryHistory {
 //         phoneNumber: "",
 //         shopAddress: "Số 7, đường Phan Chu Trinh, Hai Bà Trưng, Hà Nội",
 //       },
-//       shippingFee: 15000,
-//       price: 390000 (hoặc 0 nếu đã thanh toán),
+//       price: 390000 (hoặc 0 nếu đã thanh toán), // finalPrice
 //       productList: [
 //         {
 //           name: "Áo thun Silomon tay cộc",

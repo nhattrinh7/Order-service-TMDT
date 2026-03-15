@@ -16,6 +16,7 @@ export const OrderSchema = z.object({
   shippingFee: z.number().min(0),
   szoneVoucherDiscount: z.number().min(0),
   shopVoucherDiscount: z.number().min(0),
+  goodsPrice: z.number().min(0),
   finalPrice: z.number().min(0),
   cancelReason: z.string().nullable(),
   returnReason: z.string().nullable(),
@@ -23,4 +24,9 @@ export const OrderSchema = z.object({
   updatedAt: z.coerce.date(),
 })
 export class OrderDto extends createZodDto(OrderSchema) {}
-  
+
+export const GetOrderToShipperDtoSchema = z.object({
+  name: z.string(),
+  phoneNumber: z.string()
+})
+export class GetOrderToShipperDto extends createZodDto(GetOrderToShipperDtoSchema) {}

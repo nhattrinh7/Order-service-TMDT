@@ -8,6 +8,7 @@ export interface OrderWithItems {
   shopId: string
   status: OrderStatus
   paymentMethod: OrderPaymentMethod
+  goodsPrice: number
   finalPrice: number
   shippingAddress: string
   receiverName: string

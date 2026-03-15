@@ -20,6 +20,7 @@ import { GetUserOrdersQuery } from '~/application/queries/get-user-orders/get-us
 import { GetUserOrdersQueryDto } from '~/presentation/dtos/get-user-orders.dto'
 import { GetShopOrdersQuery } from '~/application/queries/get-shop-orders/get-shop-orders.query'
 import { GetShopOrdersQueryDto } from '~/presentation/dtos/get-shop-orders.dto'
+import { GetOrderToShipperDto } from '~/presentation/dtos/order.dto'
 
 @Controller('v1/orders')
 export class OrderController {
@@ -105,4 +106,15 @@ export class OrderController {
       ),
     )
   }
+
+  // @Get(':id/shipper')
+  // async getOrderToShipper(
+  //   @Param('id', ParseUUIDPipe) orderId: string,
+  //   @Headers('x-user-id') shipperId: string,
+  //   @Body() body: GetOrderToShipperDto,
+  // ) {
+  //   return this.queryBus.execute(
+  //     new GetOrderToShipperQuery(orderId, shipperId, body.name, body.phoneNumber),
+  //   )
+  // }
 }

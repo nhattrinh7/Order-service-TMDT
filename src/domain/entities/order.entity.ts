@@ -20,6 +20,7 @@ export class Order extends AggregateRoot {
     public shippingFee: number,
     public szoneVoucherDiscount: number,
     public shopVoucherDiscount: number,
+    public goodsPrice: number,
     public finalPrice: number,
     public cancelReason: string | null,
     public returnReason: string | null,
@@ -42,6 +43,7 @@ export class Order extends AggregateRoot {
     shippingFee: number
     szoneVoucherDiscount: number
     shopVoucherDiscount: number
+    goodsPrice: number
     finalPrice: number
     paymentId?: string
     items: Array<{
@@ -74,6 +76,7 @@ export class Order extends AggregateRoot {
       data.shippingFee,
       data.szoneVoucherDiscount,
       data.shopVoucherDiscount,
+      data.goodsPrice,
       data.finalPrice,
       null,
       null,

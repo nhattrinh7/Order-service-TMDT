@@ -31,6 +31,7 @@ export class SagaOrderConsumer extends BaseRetryConsumer {
         shippingFee: number
         shopVoucherDiscount: number
         szoneVoucherDiscount: number
+        goodsPrice: number
         finalPrice: number
         paymentMethod: string
         paymentId?: string

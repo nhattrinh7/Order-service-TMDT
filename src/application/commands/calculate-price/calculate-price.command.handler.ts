@@ -339,12 +339,14 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
 
     // 9. Tính tổng giá cuối cùng
     const finalPrice = totalSubtotal + totalShippingFee - totalShopVoucherDiscount - szoneVoucherDiscount
+    const goodsPrice = totalSubtotal - totalShopVoucherDiscount - szoneVoucherDiscount
 
     const summary: SummaryDto = {
       subtotal: totalSubtotal,
       shippingFee: totalShippingFee,
       shopsVoucherDiscount: totalShopVoucherDiscount,
       szoneVoucherDiscount,
+      goodsPrice,
       finalPrice,
     }
 

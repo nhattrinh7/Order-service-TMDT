@@ -24,6 +24,7 @@ interface OrderResponse {
   buyerAvatar: string | null
   status: string
   paymentMethod: string
+  goodsPrice: number
   finalPrice: number
   shippingAddress: string
   receiverName: string
@@ -97,6 +98,7 @@ export class GetShopOrdersHandler implements IQueryHandler<GetShopOrdersQuery> {
       buyerAvatar: userMap.get(order.userId)?.avatar || null,
       status: order.status,
       paymentMethod: order.paymentMethod,
+      goodsPrice: order.goodsPrice,
       finalPrice: order.finalPrice,
       shippingAddress: order.shippingAddress,
       receiverName: order.receiverName,

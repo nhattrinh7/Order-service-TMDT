@@ -30,6 +30,7 @@ export class SagaCreateOrdersHandler implements ICommandHandler<SagaCreateOrders
         shippingFee: data.shippingFee,
         szoneVoucherDiscount: data.szoneVoucherDiscount,
         shopVoucherDiscount: data.shopVoucherDiscount,
+        goodsPrice: data.goodsPrice,
         finalPrice: data.finalPrice,
         paymentId: data.paymentId,
         items: data.items.map(item => ({
