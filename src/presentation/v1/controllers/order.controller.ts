@@ -15,12 +15,17 @@ import { CalculatePriceCommand } from '~/application/commands/calculate-price/ca
 import { CancelOrderCommand } from '~/application/commands/cancel-order/cancel-order.command'
 import { AcceptOrderCommand } from '~/application/commands/accept-order/accept-order.command'
 import { DispatchOrderCommand } from '~/application/commands/dispatch-order/dispatch-order.command'
+import { ArrivedWarehouseCommand } from '~/application/commands/arrived-warehouse/arrived-warehouse.command'
 import { CancelOrderDto } from '~/presentation/dtos/cancel-order.dto'
 import { GetUserOrdersQuery } from '~/application/queries/get-user-orders/get-user-orders.query'
-import { GetUserOrdersQueryDto } from '~/presentation/dtos/get-user-orders.dto'
+import { GetUserOrdersQueryDto } from '~/presentation/dtos/order.dto'
 import { GetShopOrdersQuery } from '~/application/queries/get-shop-orders/get-shop-orders.query'
 import { GetShopOrdersQueryDto } from '~/presentation/dtos/get-shop-orders.dto'
 import { GetOrderToShipperDto } from '~/presentation/dtos/order.dto'
+import { ArrivedWarehouseDto } from '~/presentation/dtos/warehouse.dto'
+import { GetOrderToShipperQuery } from '~/application/queries/get-order-to-shipper/get-order-to-shipper.query'
+import { DeliverySuccessCommand } from '~/application/commands/delivery-success/delivery-success.command'
+import { DeliveryFailCommand } from '~/application/commands/delivery-fail/delivery-fail.command'
 
 @Controller('v1/orders')
 export class OrderController {
@@ -107,14 +112,44 @@ export class OrderController {
     )
   }
 
-  // @Get(':id/shipper')
-  // async getOrderToShipper(
-  //   @Param('id', ParseUUIDPipe) orderId: string,
-  //   @Headers('x-user-id') shipperId: string,
-  //   @Body() body: GetOrderToShipperDto,
-  // ) {
-  //   return this.queryBus.execute(
-  //     new GetOrderToShipperQuery(orderId, shipperId, body.name, body.phoneNumber),
-  //   )
-  // }
+  @Post(':id/arrived-warehouse')
+  async arrivedWarehouse(
+    @Param('id', ParseUUIDPipe) orderId: string,
+    @Body() body: ArrivedWarehouseDto,
+  ) {
+    await this.commandBus.execute(
+      new ArrivedWarehouseCommand(orderId, body.name, body.address),
+    )
+
+    return { message: 'Đã cập nhật trạng thái đơn hàng đến kho' }
+  }
+
+  @Get(':id/shipper')
+  async getOrderToShipper(
+    @Param('id', ParseUUIDPipe) orderId: string,
+    @Headers('x-user-id') shipperId: string,
+    @Body() body: GetOrderToShipperDto,
+  ) {
+    const result = await this.queryBus.execute(
+      new GetOrderToShipperQuery(orderId, shipperId, body.name, body.phoneNumber),
+    )
+
+    return { message: 'Đã cập nhật thông tin shipper', data: result }
+  }
+
+  @Post(':id/delivery-success')
+  async deliverySuccess(
+    @Param('id', ParseUUIDPipe) id: string
+  ) {
+    await this.commandBus.execute(new DeliverySuccessCommand(id))
+    return { message: 'Đơn hàng đã được đánh dấu giao thành công' }
+  }
+
+  @Post(':id/delivery-fail')
+  async deliveryFail(
+    @Param('id', ParseUUIDPipe) id: string
+  ) {
+    await this.commandBus.execute(new DeliveryFailCommand(id))
+    return { message: 'Đơn hàng đã được đánh dấu giao thất bại' }
+  }
 }

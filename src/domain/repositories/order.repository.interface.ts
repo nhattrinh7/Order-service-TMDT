@@ -39,7 +39,9 @@ export interface IOrderRepository {
 
   updateStatus(orderId: string, status: OrderStatus, cancelReason?: string): Promise<void>
 
-  findById(orderId: string): Promise<Order | null>
+  findById(orderId: string, tx?: any): Promise<Order | null>
+
+  findByIdWithItems(orderId: string, tx?: any): Promise<Order | null>
 
   findByUserIdPaginated(
     userId: string,

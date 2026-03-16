@@ -4,6 +4,8 @@ import { ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interfa
 import { OrderRepository } from '~/infrastructure/database/repositories/order.repository'
 import { WAREHOUSE_REPOSITORY } from '~/domain/repositories/warehouse.repository.interface'
 import { WarehouseRepository } from '~/infrastructure/database/repositories/warehouse.repository'
+import { ORDER_DELIVERY_HISTORY_REPOSITORY } from '~/domain/repositories/order-delivery-history.repository.interface'
+import { OrderDeliveryHistoryRepository } from '~/infrastructure/database/repositories/order-delivery-history.repository'
 import { CqrsModule } from '@nestjs/cqrs'
 
 
@@ -19,6 +21,10 @@ import { CqrsModule } from '@nestjs/cqrs'
       provide: WAREHOUSE_REPOSITORY,
       useClass: WarehouseRepository,
     },
+    {
+      provide: ORDER_DELIVERY_HISTORY_REPOSITORY,
+      useClass: OrderDeliveryHistoryRepository,
+    },
     
   ],
 
@@ -26,6 +32,7 @@ import { CqrsModule } from '@nestjs/cqrs'
     PrismaService,
     ORDER_REPOSITORY,
     WAREHOUSE_REPOSITORY,
+    ORDER_DELIVERY_HISTORY_REPOSITORY,
   ],
 
 })

@@ -13,6 +13,10 @@ import { GetShopOrdersHandler } from './queries/get-shop-orders/get-shop-orders.
 import { DispatchOrderHandler } from './commands/dispatch-order/dispatch-order.command.handler'
 import { GetScannerWarehouseHandler } from './queries/get-scanner-warehouse/get-scanner-warehouse.handler'
 import { CreateWarehouseHandler } from './commands/create-warehouse/create-warehouse.handler'
+import { ArrivedWarehouseHandler } from './commands/arrived-warehouse/arrived-warehouse.handler'
+import { GetOrderToShipperHandler } from './queries/get-order-to-shipper/get-order-to-shipper.handler'
+import { DeliverySuccessHandler } from './commands/delivery-success/delivery-success.handler'
+import { DeliveryFailHandler } from './commands/delivery-fail/delivery-fail.handler'
 
 const CommandHandlers = [
   CalculatePriceHandler,
@@ -23,12 +27,16 @@ const CommandHandlers = [
   AcceptOrderHandler,
   DispatchOrderHandler,
   CreateWarehouseHandler,
+  ArrivedWarehouseHandler,
+  DeliverySuccessHandler,
+  DeliveryFailHandler,
 ]
 
 const QueryHandlers = [
   GetUserOrdersHandler,
   GetShopOrdersHandler,
   GetScannerWarehouseHandler,
+  GetOrderToShipperHandler,
 ]
 
 const EventHandlers = [

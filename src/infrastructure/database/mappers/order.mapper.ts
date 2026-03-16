@@ -1,6 +1,7 @@
 
 import { Order as PrismaOrder, OrderStatus as PrismaOrderStatus, OrderPaymentMethod as PrismaOrderPaymentMethod } from '@prisma/client'
 import { Order } from '~/domain/entities/order.entity'
+import { OrderItem } from '~/domain/entities/order-item.entity'
 import { OrderStatus, OrderPaymentMethod } from '~/domain/enums/order.enum'
 
 export class OrderMapper {
@@ -27,6 +28,26 @@ export class OrderMapper {
       prismaOrder.createdAt,
       prismaOrder.updatedAt,
     )
+  }
+
+  static toDomainWithItems(prismaOrder: PrismaOrder & { orderItems: any[] }): Order {
+    const orderItems = prismaOrder.orderItems.map((item: any) => {
+      const orderItem = OrderItem.create({
+        productId: item.productId,
+        productVariantId: item.productVariantId,
+        productName: item.productName,
+        variantImage: item.variantImage,
+        sku: item.sku,
+        quantity: item.quantity,
+        finalPrice: item.finalPrice,
+      });
+      (orderItem as any).props.id = item.id;
+      return orderItem;
+    })
+
+    const order = this.toDomain(prismaOrder)
+    order.orderItems = orderItems
+    return order
   }
 
   static toPersistence(order: Order): PrismaOrder {

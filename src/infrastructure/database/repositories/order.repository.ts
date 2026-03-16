@@ -65,14 +65,29 @@ export class OrderRepository implements IOrderRepository {
     })
   }
 
-  async findById(orderId: string): Promise<Order | null> {
-    const prismaOrder = await this.prisma.order.findUnique({
+  async findById(orderId: string, tx?: any): Promise<Order | null> {
+    const client = tx || this.prisma
+    const prismaOrder = await client.order.findUnique({
       where: { id: orderId },
     })
 
     if (!prismaOrder) return null
 
     return OrderMapper.toDomain(prismaOrder)
+  }
+
+  async findByIdWithItems(orderId: string, tx?: any): Promise<Order | null> {
+    const client = tx || this.prisma
+    const prismaOrder = await client.order.findUnique({
+      where: { id: orderId },
+      include: {
+        orderItems: true
+      }
+    })
+
+    if (!prismaOrder) return null
+
+    return OrderMapper.toDomainWithItems(prismaOrder)
   }
 
   async findByUserIdPaginated(

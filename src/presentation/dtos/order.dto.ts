@@ -26,7 +26,19 @@ export const OrderSchema = z.object({
 export class OrderDto extends createZodDto(OrderSchema) {}
 
 export const GetOrderToShipperDtoSchema = z.object({
-  name: z.string(),
-  phoneNumber: z.string()
+  name: z.string(), // tên của shipper
+  phoneNumber: z.string() // số điện thoại của shipper
 })
 export class GetOrderToShipperDto extends createZodDto(GetOrderToShipperDtoSchema) {}
+
+
+export const GetUserOrdersQuerySchema = z.object({
+  status: z.enum(OrderStatus),
+  cursor: z.string().optional(),
+  limit: z
+    .string()
+    .optional()
+    .transform((val) => (val ? parseInt(val, 10) : 10))
+    .pipe(z.number().int().positive().max(50)),
+})
+export class GetUserOrdersQueryDto extends createZodDto(GetUserOrdersQuerySchema) {}

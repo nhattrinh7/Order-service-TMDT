@@ -153,24 +153,6 @@ model OrderDeliveryHistory {
 //   }
 // }
 
-// {
-//   name: string,
-//   phoneNumber: string,
-// }
-
-// {
-//   orderId: uuid
-//   success: true
-// }
-
-// {
-//   orderId: uuid
-//   warehouse: {
-//     name: string
-//     address: string
-//   }
-// }
-
 // }
 //   success: true
 //   message: "Get order to shipper successfully"
