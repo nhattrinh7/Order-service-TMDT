@@ -11,6 +11,8 @@ import { AcceptOrderHandler } from './commands/accept-order/accept-order.command
 import { GetUserOrdersHandler } from './queries/get-user-orders/get-user-orders.query.handler'
 import { GetShopOrdersHandler } from './queries/get-shop-orders/get-shop-orders.query.handler'
 import { DispatchOrderHandler } from './commands/dispatch-order/dispatch-order.command.handler'
+import { GetScannerWarehouseHandler } from './queries/get-scanner-warehouse/get-scanner-warehouse.handler'
+import { CreateWarehouseHandler } from './commands/create-warehouse/create-warehouse.handler'
 
 const CommandHandlers = [
   CalculatePriceHandler,
@@ -20,11 +22,13 @@ const CommandHandlers = [
   CancelOrderHandler,
   AcceptOrderHandler,
   DispatchOrderHandler,
+  CreateWarehouseHandler,
 ]
 
 const QueryHandlers = [
   GetUserOrdersHandler,
   GetShopOrdersHandler,
+  GetScannerWarehouseHandler,
 ]
 
 const EventHandlers = [

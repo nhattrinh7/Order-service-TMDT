@@ -1,5 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { Inject } from '@nestjs/common'
+import * as QRCode from 'qrcode'
 import { SagaCreateOrdersCommand } from './saga-create-orders.command'
 import type { IOrderRepository } from '~/domain/repositories/order.repository.interface'
 import { ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interface'
@@ -44,6 +45,11 @@ export class SagaCreateOrdersHandler implements ICommandHandler<SagaCreateOrders
         })),
       })
     )
+
+    // Sinh QR code cho từng đơn hàng từ order id
+    for (const order of orders) {
+      order.qrCode = await QRCode.toDataURL(order.id)
+    }
 
     // Transaction: tạo nhiều orders + orderItems phải atomic
     const orderIds = await this.prismaService.transaction(async (tx) => {

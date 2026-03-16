@@ -23,6 +23,7 @@ export class OrderMapper {
       prismaOrder.finalPrice,
       prismaOrder.cancelReason,
       prismaOrder.returnReason,
+      prismaOrder.qrCode,
       prismaOrder.createdAt,
       prismaOrder.updatedAt,
     )
@@ -47,6 +48,7 @@ export class OrderMapper {
       finalPrice: order.finalPrice,
       cancelReason: order.cancelReason,
       returnReason: order.returnReason,
+      qrCode: order.qrCode,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
     }

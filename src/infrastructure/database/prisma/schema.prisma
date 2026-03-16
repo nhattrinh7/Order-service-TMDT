@@ -51,13 +51,11 @@ model Order {
   shippingFee          Int                @map("shipping_fee") // Cố định là 1000
   szoneVoucherDiscount Int                @default(0) @map("szone_voucher_discount")
   shopVoucherDiscount  Int                @default(0) @map("shop_voucher_discount")
-  // nên có 1 trường thể hiện giá của đơn hàng ko bao gồm phí ship. khi giao đơn cho người mua cũng rành mạch
-  // khoản nào hàng khoản nào ship. nếu ko nhận hàng thì vẫn biết ship bao nhiêu để trả ship. rồi khi người mua
-  // trả hàng hoàn tiền thì cũng là hoàn khoản tiền của hàng chứ ko hoàn cả phí ship.
   goodsPrice           Int                @map("goods_price")
   finalPrice           Int                @map("final_price")
   cancelReason         String?            @map("cancel_reason") @db.Text
   returnReason         String?            @map("return_reason") @db.Text
+  qrCode               String?            @map("qr_code") @db.Text
   createdAt            DateTime           @default(now()) @map("created_at")
   updatedAt            DateTime           @updatedAt @map("updated_at")
 
@@ -117,8 +115,8 @@ enum PayoutStatus {
 
 model TransitWarehouse {
   id        String @id @default(uuid()) @db.Uuid
-  scannerId String @map("scanner_id") @db.Uuid
-  name      String @db.VarChar(255)
+  scannerId String @unique @map("scanner_id") @db.Uuid
+  name      String @unique @db.VarChar(255)
   address   String @db.Text
 
   @@map("transit_warehouses")
@@ -129,6 +127,8 @@ model OrderDeliveryHistory {
   orderId    String @map("order_id") @db.Uuid
   warehouses Json?  @map("warehouse_history")
   shipper    Json?
+
+  @@map("order_delivery_histories")
 }
 
 // {

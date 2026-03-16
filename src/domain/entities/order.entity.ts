@@ -24,6 +24,7 @@ export class Order extends AggregateRoot {
     public finalPrice: number,
     public cancelReason: string | null,
     public returnReason: string | null,
+    public qrCode: string | null,
     public createdAt: Date,
     public updatedAt: Date,
     orderItems: OrderItem[] = [],
@@ -80,6 +81,7 @@ export class Order extends AggregateRoot {
       data.finalPrice,
       null,
       null,
+      null, // qrCode - sẽ được gán ở handler
       new Date(),
       new Date(),
       orderItems,
