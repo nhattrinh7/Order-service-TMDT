@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+﻿import { Module } from '@nestjs/common'
 import { CqrsModule } from '@nestjs/cqrs'
 import { DatabaseModule } from '~/infrastructure/database/database.module'
 import { MessagingModule } from '~/infrastructure/messaging/messaging.module'
@@ -10,6 +10,7 @@ import { CancelOrderHandler } from './commands/cancel-order/cancel-order.command
 import { AcceptOrderHandler } from './commands/accept-order/accept-order.command.handler'
 import { GetUserOrdersHandler } from './queries/get-user-orders/get-user-orders.query.handler'
 import { GetShopOrdersHandler } from './queries/get-shop-orders/get-shop-orders.query.handler'
+import { GetAdminOrdersHandler } from './queries/get-admin-orders/get-admin-orders.query.handler'
 import { DispatchOrderHandler } from './commands/dispatch-order/dispatch-order.command.handler'
 import { GetScannerWarehouseHandler } from './queries/get-scanner-warehouse/get-scanner-warehouse.handler'
 import { CreateWarehouseHandler } from './commands/create-warehouse/create-warehouse.handler'
@@ -17,6 +18,8 @@ import { ArrivedWarehouseHandler } from './commands/arrived-warehouse/arrived-wa
 import { GetOrderToShipperHandler } from './queries/get-order-to-shipper/get-order-to-shipper.handler'
 import { DeliverySuccessHandler } from './commands/delivery-success/delivery-success.handler'
 import { DeliveryFailHandler } from './commands/delivery-fail/delivery-fail.handler'
+import { RequestReturnOrderItemHandler } from './commands/request-return-order-item/request-return-order-item.command.handler'
+import { GetShopSettlementsHandler } from './queries/get-shop-settlements/get-shop-settlements.query.handler'
 
 const CommandHandlers = [
   CalculatePriceHandler,
@@ -30,13 +33,16 @@ const CommandHandlers = [
   ArrivedWarehouseHandler,
   DeliverySuccessHandler,
   DeliveryFailHandler,
+  RequestReturnOrderItemHandler,
 ]
 
 const QueryHandlers = [
   GetUserOrdersHandler,
   GetShopOrdersHandler,
+  GetAdminOrdersHandler,
   GetScannerWarehouseHandler,
   GetOrderToShipperHandler,
+  GetShopSettlementsHandler,
 ]
 
 const EventHandlers = [

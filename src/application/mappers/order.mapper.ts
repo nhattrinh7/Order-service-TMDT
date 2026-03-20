@@ -20,7 +20,6 @@ export class OrderMapper {
       goodsPrice: order.goodsPrice,
       finalPrice: order.finalPrice,
       cancelReason: order.cancelReason,
-      returnReason: order.returnReason,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
     } 

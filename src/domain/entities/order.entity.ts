@@ -23,7 +23,6 @@ export class Order extends AggregateRoot {
     public goodsPrice: number,
     public finalPrice: number,
     public cancelReason: string | null,
-    public returnReason: string | null,
     public qrCode: string | null,
     public createdAt: Date,
     public updatedAt: Date,
@@ -80,7 +79,6 @@ export class Order extends AggregateRoot {
       data.goodsPrice,
       data.finalPrice,
       null,
-      null,
       null, // qrCode - sẽ được gán ở handler
       new Date(),
       new Date(),
@@ -98,3 +96,4 @@ export class Order extends AggregateRoot {
     this.updatedAt = new Date()
   }
 }
+

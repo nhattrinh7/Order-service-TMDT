@@ -1,4 +1,4 @@
-import { ConfigService } from '@nestjs/config'
+﻿import { ConfigService } from '@nestjs/config'
 
 class EnvConfig {
   constructor(private configService: ConfigService) {}
@@ -9,6 +9,7 @@ class EnvConfig {
       SERVICE_NAME: this.configService.get<string>('SERVICE_NAME'),
       SERVICE_HOST: this.configService.get<string>('SERVICE_HOST'),
       PORT: this.configService.get<string>('PORT'),
+      SUPER_ADMIN_ID: this.configService.get<string>('SUPER_ADMIN_ID'),
     }
   }
 }

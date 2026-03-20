@@ -1,4 +1,4 @@
-import {
+﻿import {
   Body,
   Controller,
   Get,
@@ -21,11 +21,15 @@ import { GetUserOrdersQuery } from '~/application/queries/get-user-orders/get-us
 import { GetUserOrdersQueryDto } from '~/presentation/dtos/order.dto'
 import { GetShopOrdersQuery } from '~/application/queries/get-shop-orders/get-shop-orders.query'
 import { GetShopOrdersQueryDto } from '~/presentation/dtos/get-shop-orders.dto'
+import { GetAdminOrdersQuery } from '~/application/queries/get-admin-orders/get-admin-orders.query'
+import { GetAdminOrdersQueryDto } from '~/presentation/dtos/get-admin-orders.dto'
 import { GetOrderToShipperDto } from '~/presentation/dtos/order.dto'
 import { ArrivedWarehouseDto } from '~/presentation/dtos/warehouse.dto'
 import { GetOrderToShipperQuery } from '~/application/queries/get-order-to-shipper/get-order-to-shipper.query'
 import { DeliverySuccessCommand } from '~/application/commands/delivery-success/delivery-success.command'
 import { DeliveryFailCommand } from '~/application/commands/delivery-fail/delivery-fail.command'
+import { RequestReturnOrderItemCommand } from '~/application/commands/request-return-order-item/request-return-order-item.command'
+import { RequestReturnOrderItemDto } from '~/presentation/dtos/order-item-return.dto'
 
 @Controller('v1/orders')
 export class OrderController {
@@ -33,6 +37,21 @@ export class OrderController {
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,
   ) {}
+
+  @Get()
+  async getAdminOrders(
+    @Query() query: GetAdminOrdersQueryDto,
+  ) {
+    return this.queryBus.execute(
+      new GetAdminOrdersQuery(
+        query.page,
+        query.limit,
+        query.status,
+        query.returnStatus,
+        query.search,
+      ),
+    )
+  }
   
   @Get('users/:userId')
   async getUserOrders(
@@ -40,7 +59,7 @@ export class OrderController {
     @Query() query: GetUserOrdersQueryDto,
   ) {
     return this.queryBus.execute(
-      new GetUserOrdersQuery(userId, query.status, query.cursor, query.limit),
+      new GetUserOrdersQuery(userId, query.status, query.returnStatus, query.cursor, query.limit),
     )
   }
 
@@ -107,6 +126,7 @@ export class OrderController {
         query.page,
         query.limit,
         query.status,
+        query.returnStatus,
         query.search,
       ),
     )
@@ -139,9 +159,10 @@ export class OrderController {
 
   @Post(':id/delivery-success')
   async deliverySuccess(
-    @Param('id', ParseUUIDPipe) id: string
+    @Param('id', ParseUUIDPipe) id: string,
+    @Body('shopId') shopId: string,
   ) {
-    await this.commandBus.execute(new DeliverySuccessCommand(id))
+    await this.commandBus.execute(new DeliverySuccessCommand(id, shopId))
     return { message: 'Đơn hàng đã được đánh dấu giao thành công' }
   }
 
@@ -151,5 +172,16 @@ export class OrderController {
   ) {
     await this.commandBus.execute(new DeliveryFailCommand(id))
     return { message: 'Đơn hàng đã được đánh dấu giao thất bại' }
+  }
+
+  @Patch('items/:itemId/return-request')
+  async requestReturnOrderItem(
+    @Param('itemId', ParseUUIDPipe) itemId: string,
+    @Headers('x-user-id') userId: string,
+    @Body() body: RequestReturnOrderItemDto,
+  ) {
+    return this.commandBus.execute(
+      new RequestReturnOrderItemCommand(itemId, userId, body.returnReason),
+    )
   }
 }

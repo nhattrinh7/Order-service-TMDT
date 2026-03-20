@@ -1,8 +1,7 @@
 import { OrderStatus, OrderItemReturnStatus } from '~/domain/enums/order.enum'
 
-export class GetShopOrdersQuery {
+export class GetAdminOrdersQuery {
   constructor(
-    public readonly shopId: string,
     public readonly page: number,
     public readonly limit: number,
     public readonly status: OrderStatus,
@@ -10,3 +9,5 @@ export class GetShopOrdersQuery {
     public readonly search?: string,
   ) {}
 }
+
+

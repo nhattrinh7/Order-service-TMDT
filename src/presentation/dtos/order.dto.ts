@@ -1,6 +1,6 @@
 import { createZodDto } from 'nestjs-zod'
 import z from 'zod'
-import { OrderStatus, OrderPaymentMethod } from '~/domain/enums/order.enum'
+import { OrderStatus, OrderPaymentMethod, OrderItemReturnStatus } from '~/domain/enums/order.enum'
 
 export const OrderSchema = z.object({
   id: z.uuid(),
@@ -19,7 +19,6 @@ export const OrderSchema = z.object({
   goodsPrice: z.number().min(0),
   finalPrice: z.number().min(0),
   cancelReason: z.string().nullable(),
-  returnReason: z.string().nullable(),
   createdAt: z.coerce.date(),
   updatedAt: z.coerce.date(),
 })
@@ -34,6 +33,7 @@ export class GetOrderToShipperDto extends createZodDto(GetOrderToShipperDtoSchem
 
 export const GetUserOrdersQuerySchema = z.object({
   status: z.enum(OrderStatus),
+  returnStatus: z.enum(OrderItemReturnStatus).optional(),
   cursor: z.string().optional(),
   limit: z
     .string()

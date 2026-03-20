@@ -23,7 +23,6 @@ export class OrderMapper {
       prismaOrder.goodsPrice,
       prismaOrder.finalPrice,
       prismaOrder.cancelReason,
-      prismaOrder.returnReason,
       prismaOrder.qrCode,
       prismaOrder.createdAt,
       prismaOrder.updatedAt,
@@ -40,6 +39,10 @@ export class OrderMapper {
         sku: item.sku,
         quantity: item.quantity,
         finalPrice: item.finalPrice,
+        returnReason: item.returnReason,
+        returnStatus: item.returnStatus,
+        returnRequestedAt: item.returnRequestedAt,
+        returnResolvedAt: item.returnResolvedAt,
       });
       (orderItem as any).props.id = item.id;
       return orderItem;
@@ -68,7 +71,6 @@ export class OrderMapper {
       goodsPrice: order.goodsPrice,
       finalPrice: order.finalPrice,
       cancelReason: order.cancelReason,
-      returnReason: order.returnReason,
       qrCode: order.qrCode,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,

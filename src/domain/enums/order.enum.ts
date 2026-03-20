@@ -18,3 +18,9 @@ export const OrderPaymentMethod = {
   QRCODE: 'QRCODE',
 } as const
 export type OrderPaymentMethod = (typeof OrderPaymentMethod)[keyof typeof OrderPaymentMethod]
+
+export const OrderItemReturnStatus = {
+  NONE: 'NONE',
+  REFUNDED: 'REFUNDED',
+} as const
+export type OrderItemReturnStatus = (typeof OrderItemReturnStatus)[keyof typeof OrderItemReturnStatus]

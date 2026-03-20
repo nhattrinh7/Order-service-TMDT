@@ -1,6 +1,6 @@
-import { Order } from '~/domain/entities/order.entity'
+﻿import { Order } from '~/domain/entities/order.entity'
 import { OrderStatus } from '~/domain/enums/order.enum'
-import { OrderPaymentMethod } from '~/domain/enums/order.enum' // Assuming OrderPaymentMethod is also an enum from order.enum
+import { OrderPaymentMethod, OrderItemReturnStatus } from '~/domain/enums/order.enum' // Assuming OrderPaymentMethod is also an enum from order.enum
 
 export interface OrderWithItems {
   id: string
@@ -18,7 +18,6 @@ export interface OrderWithItems {
   szoneVoucherDiscount: number
   shopVoucherDiscount: number
   cancelReason: string | null
-  returnReason: string | null
   createdAt: Date
   orderItems: Array<{
     id: string
@@ -29,6 +28,10 @@ export interface OrderWithItems {
     sku: string
     quantity: number
     finalPrice: number
+    returnReason: string | null
+    returnStatus: OrderItemReturnStatus
+    returnRequestedAt: Date | null
+    returnResolvedAt: Date | null
   }>
 }
 
@@ -46,15 +49,31 @@ export interface IOrderRepository {
   findByUserIdPaginated(
     userId: string,
     status: OrderStatus,
+    returnStatus?: OrderItemReturnStatus,
     cursorTimestamp?: Date,
     cursorId?: string,
     limit?: number,
+  ): Promise<OrderWithItems[]>
+
+  countByStatus(
+    status: OrderStatus,
+    search?: string,
+    returnStatus?: OrderItemReturnStatus,
+  ): Promise<number>
+
+  findByStatusPaginated(
+    status: OrderStatus,
+    skip: number,
+    take: number,
+    search?: string,
+    returnStatus?: OrderItemReturnStatus,
   ): Promise<OrderWithItems[]>
 
   countByShopId(
     shopId: string,
     status: OrderStatus,
     search?: string,
+    returnStatus?: OrderItemReturnStatus,
   ): Promise<number>
 
   findByShopIdPaginated(
@@ -63,6 +82,22 @@ export interface IOrderRepository {
     skip: number,
     take: number,
     search?: string,
+    returnStatus?: OrderItemReturnStatus,
   ): Promise<OrderWithItems[]>
+
+  findOrderItemByIdWithOrder(
+    orderItemId: string,
+  ): Promise<{
+    id: string
+    returnStatus: OrderItemReturnStatus
+    finalPrice: number
+    orderId: string
+    order: { userId: string; status: OrderStatus }
+  } | null>
+
+  updateOrderItemReturnRequest(
+    orderItemId: string,
+    returnReason: string,
+  ): Promise<void>
 }
 export const ORDER_REPOSITORY = Symbol('IOrderRepository')

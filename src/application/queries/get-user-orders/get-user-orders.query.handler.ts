@@ -16,6 +16,11 @@ interface OrderItemResponse {
   sku: string
   quantity: number
   finalPrice: number
+  isReviewed?: boolean
+  returnReason?: string | null
+  returnStatus?: string
+  returnRequestedAt?: Date | null
+  returnResolvedAt?: Date | null
 }
 
 interface OrderResponse {
@@ -41,7 +46,7 @@ export class GetUserOrdersHandler implements IQueryHandler<GetUserOrdersQuery> {
   ) {}
 
   async execute(query: GetUserOrdersQuery) {
-    const { userId, status, cursor, limit } = query
+    const { userId, status, returnStatus, cursor, limit } = query
 
     // Decode compound cursor nếu có
     let cursorTimestamp: Date | undefined
@@ -56,6 +61,7 @@ export class GetUserOrdersHandler implements IQueryHandler<GetUserOrdersQuery> {
     const orders = await this.orderRepository.findByUserIdPaginated(
       userId,
       status,
+      returnStatus,
       cursorTimestamp,
       cursorId,
       limit + 1,
@@ -75,6 +81,38 @@ export class GetUserOrdersHandler implements IQueryHandler<GetUserOrdersQuery> {
       >('get.shop.simple_data', { shopIds })
 
       shopsMap = new Map(shopsResponse.map(s => [s.id, s]))
+    }
+
+    // Lấy reviewed items từ catalog-service (chỉ khi đơn giao thành công)
+    const shouldCheckReviewed = status === OrderStatus.DELIVERY_COMPLETED
+    const reviewedKeySet = new Set<string>()
+
+    if (shouldCheckReviewed) {
+      const reviewPairsMap = new Map<string, { orderId: string; productId: string }>()
+      resultOrders.forEach(order => {
+        order.orderItems.forEach(item => {
+          const key = `${order.id}:${item.productId}`
+          if (!reviewPairsMap.has(key)) {
+            reviewPairsMap.set(key, { orderId: order.id, productId: item.productId })
+          }
+        })
+      })
+      const reviewPairs = Array.from(reviewPairsMap.values())
+      
+      console.log('reviewPairs', reviewPairs)
+
+      if (reviewPairs.length > 0) {
+        const reviewedPairs = await this.messagePublisher.sendToCatalogService<
+          { items: Array<{ orderId: string; productId: string }> },
+          Array<{ orderId: string; productId: string }>
+        >('get.reviewed.order-items', { items: reviewPairs })
+
+        console.log('reviewedPairs', reviewedPairs)
+
+        reviewedPairs.forEach(pair => {
+          reviewedKeySet.add(`${pair.orderId}:${pair.productId}`)
+        })
+      }
     }
 
     // Build response
@@ -98,6 +136,13 @@ export class GetUserOrdersHandler implements IQueryHandler<GetUserOrdersQuery> {
           sku: item.sku,
           quantity: item.quantity,
           finalPrice: item.finalPrice,
+          returnReason: item.returnReason,
+          returnStatus: item.returnStatus,
+          returnRequestedAt: item.returnRequestedAt,
+          returnResolvedAt: item.returnResolvedAt,
+          isReviewed: shouldCheckReviewed
+            ? reviewedKeySet.has(`${order.id}:${item.productId}`)
+            : false,
         })),
       }
     })

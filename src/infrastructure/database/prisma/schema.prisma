@@ -54,7 +54,6 @@ model Order {
   goodsPrice           Int                @map("goods_price")
   finalPrice           Int                @map("final_price")
   cancelReason         String?            @map("cancel_reason") @db.Text
-  returnReason         String?            @map("return_reason") @db.Text
   qrCode               String?            @map("qr_code") @db.Text
   createdAt            DateTime           @default(now()) @map("created_at")
   updatedAt            DateTime           @updatedAt @map("updated_at")
@@ -75,22 +74,33 @@ model OrderItem {
   sku              String // Nâu-XL
   quantity         Int
   finalPrice       Int // Giá 1 đơn vị tại thời điểm mua (đã tính vouchers)
+  returnReason     String? @map("return_reason") @db.Text
+  returnStatus     OrderItemReturnStatus @default(NONE) @map("return_status")
+  returnRequestedAt DateTime? @map("return_requested_at")
+  returnResolvedAt  DateTime? @map("return_resolved_at")
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
   @@map("order_items")
 }
 
+enum OrderItemReturnStatus {
+  NONE
+  REFUNDED
+}
+
 // Sau khi shipper giao hàng thành công sẽ tạo bản ghi Settlement, shipper giao thành công sẽ gửi api chứa orderId lên BE
 // dùng orderId này để lấy ra bản ghi Order và dùng dữ liệu từ bản ghi Order này để tạo bản ghi Settlement
-// goodsPrice = finalPrice của Order
-// commissionFee = finalPrice * 5%
+// commissionFee = goodsPrice * 5%
 // payout = finalPrice - commissionFee
+// Đơn hàng giao thất bại thì ko tạo bản ghi Settlement, người mua được refund nếu đã thanh toán và sản phẩm được hoàn về shop.
 model Settlement {
   id            String        @id @default(uuid()) @db.Uuid
   orderId       String        @unique @map("order_id") @db.Uuid
   shopId        String        @map("shop_id") @db.Uuid
   goodsPrice    Int           @map("goods_price")
+  finalPrice    Int           @map("final_price")
+  shippingFee   Int           @map("shipping_fee")
   commissionFee Int           @map("commission_fee")
   payout        Int
   paymentMethod PaymentMethod @default(WALLET) @map("payment_method")
@@ -100,7 +110,7 @@ model Settlement {
   updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamptz
 
   order Order @relation(fields: [orderId], references: [id])
-
+ 
   @@map("settlements")
 }
 
