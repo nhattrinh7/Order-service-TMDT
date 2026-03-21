@@ -25,7 +25,7 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
     const { orderId, userId, cancelReason } = command
 
     // 1. Tìm đơn hàng
-    const order = await this.orderRepository.findById(orderId)
+    const order = await this.orderRepository.findByIdWithItems(orderId)
     if (!order) {
       throw new NotFoundException('Đơn hàng không tồn tại')
     }
@@ -45,7 +45,25 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
     // 4. Cập nhật trạng thái sang CANCELLED và lưu lý do
     await this.orderRepository.updateStatus(orderId, OrderStatus.CANCELLED, cancelReason)
 
-    // 5. Hoàn tiền vào ví nếu đơn đã thanh toán online (QRCODE hoặc WALLET)
+    // 5. Giảm buy_count ở catalog-service
+    const quantities = new Map<string, number>()
+    for (const item of order.orderItems) {
+      const current = quantities.get(item.productId) ?? 0
+      quantities.set(item.productId, current + item.quantity)
+    }
+    const items = Array.from(quantities.entries()).map(([productId, quantity]) => ({
+      productId,
+      quantity,
+    }))
+
+    if (items.length > 0) {
+      this.messagePublisher.emitToCatalogService('order.decrease-buy-count', {
+        orderId,
+        items,
+      })
+    }
+
+    // 6. Hoàn tiền vào ví nếu đơn đã thanh toán online (QRCODE hoặc WALLET)
     if (
       order.paymentMethod === OrderPaymentMethod.QRCODE ||
       order.paymentMethod === OrderPaymentMethod.WALLET

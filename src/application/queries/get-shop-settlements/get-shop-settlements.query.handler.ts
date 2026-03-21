@@ -63,18 +63,17 @@ export class GetShopSettlementsHandler implements IQueryHandler<GetShopSettlemen
       createdAt: settlement.createdAt,
     }))
 
-    return {
-      success: true,
-      data: {
-        items,
-        meta: {
-          page,
-          limit,
-          totalPages,
-          totalItems,
-        },
-        totalPayout: payoutSum._sum.payout ?? 0,
+    const result = {
+      items,
+      meta: {
+        page,
+        limit,
+        totalPages,
+        totalItems,
       },
+      totalPayout: payoutSum._sum.payout ?? 0,
     }
+
+    return result
   }
 }

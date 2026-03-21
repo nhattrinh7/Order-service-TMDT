@@ -14,7 +14,7 @@ export class SettlementController {
     @Param('shopId', ParseUUIDPipe) shopId: string,
     @Query() query: GetShopSettlementsQueryDto,
   ) {
-    return this.queryBus.execute(
+    const result = await this.queryBus.execute(
       new GetShopSettlementsQuery(
         shopId,
         query.page,
@@ -24,5 +24,6 @@ export class SettlementController {
         query.endDate,
       ),
     )
+    return { message: 'Get shop settlements successfully', data: result }
   }
 }

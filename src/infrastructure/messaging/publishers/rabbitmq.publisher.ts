@@ -46,6 +46,11 @@ export class RabbitMQPublisher implements IMessagePublisher {
     this.userClient.emit(pattern, this.buildRecord(event))
   }
 
+  emitToCatalogService<T>(pattern: string, event: T): void {
+    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → catalog-service`)
+    this.catalogClient.emit(pattern, this.buildRecord(event))
+  }
+
   async sendToUserService<T, R = any>(pattern: string, data: T): Promise<R> {
     this.logger.debug(`[${getKongRequestId()}] Send ${pattern} → user-service`)
     const response$ = this.userClient.send<R, T>(pattern, this.buildRecord(data) as any)
