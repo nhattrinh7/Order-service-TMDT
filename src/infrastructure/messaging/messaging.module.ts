@@ -47,6 +47,15 @@ import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-ord
         },
       },
       {
+        name: 'INVENTORY_CLIENT',
+        transport: Transport.RMQ,
+        options: {
+          urls: ['amqp://admin:admin123@localhost:5672'],
+          queue: 'inventory_queue',
+          persistent: true,
+        },
+      },
+      {
         name: 'VOUCHER_CLIENT',
         transport: Transport.RMQ,
         options: {

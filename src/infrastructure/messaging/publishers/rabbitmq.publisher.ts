@@ -17,6 +17,8 @@ export class RabbitMQPublisher implements IMessagePublisher {
     private readonly userClient: ClientProxy,
     @Inject('CATALOG_CLIENT')
     private readonly catalogClient: ClientProxy,
+    @Inject('INVENTORY_CLIENT')
+    private readonly inventoryClient: ClientProxy,
     @Inject('VOUCHER_CLIENT')
     private readonly voucherClient: ClientProxy,
     @Inject('SAGA_CLIENT')
@@ -51,6 +53,11 @@ export class RabbitMQPublisher implements IMessagePublisher {
     this.catalogClient.emit(pattern, this.buildRecord(event))
   }
 
+  emitToInventoryService<T>(pattern: string, event: T): void {
+    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} -> inventory-service`)
+    this.inventoryClient.emit(pattern, this.buildRecord(event))
+  }
+
   async sendToUserService<T, R = any>(pattern: string, data: T): Promise<R> {
     this.logger.debug(`[${getKongRequestId()}] Send ${pattern} → user-service`)
     const response$ = this.userClient.send<R, T>(pattern, this.buildRecord(data) as any)
@@ -66,6 +73,12 @@ export class RabbitMQPublisher implements IMessagePublisher {
   async sendToCatalogService<T, R = any>(pattern: string, data: T): Promise<R> {
     this.logger.debug(`[${getKongRequestId()}] Send ${pattern} → catalog-service`)
     const response$ = this.catalogClient.send<R, T>(pattern, this.buildRecord(data) as any)
+    return lastValueFrom(response$)
+  }
+
+  async sendToInventoryService<T, R = any>(pattern: string, data: T): Promise<R> {
+    this.logger.debug(`[${getKongRequestId()}] Send ${pattern} -> inventory-service`)
+    const response$ = this.inventoryClient.send<R, T>(pattern, this.buildRecord(data) as any)
     return lastValueFrom(response$)
   }
 

@@ -42,7 +42,7 @@ export class GetOrderToShipperHandler implements IQueryHandler<GetOrderToShipper
         time: new Date().toISOString()
       }
       
-      await this.historyRepository.upsertShipper(orderId, shipperData, tx)
+      await this.historyRepository.updateShipper(orderId, shipperData, tx)
 
       return orderData
     })

@@ -7,12 +7,17 @@ import { ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interfa
 import { Order } from '~/domain/entities/order.entity'
 import { OrderPaymentMethod } from '~/domain/enums/order.enum'
 import { PrismaService } from '~/infrastructure/database/prisma/prisma.service'
+import type { IOrderDeliveryHistoryRepository } from '~/domain/repositories/order-delivery-history.repository.interface'
+import { ORDER_DELIVERY_HISTORY_REPOSITORY } from '~/domain/repositories/order-delivery-history.repository.interface'
+import { OrderDeliveryHistory } from '~/domain/entities/order-delivery-history.entity'
 
 @CommandHandler(SagaCreateOrdersCommand)
 export class SagaCreateOrdersHandler implements ICommandHandler<SagaCreateOrdersCommand> {
   constructor(
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepository,
+    @Inject(ORDER_DELIVERY_HISTORY_REPOSITORY)
+    private readonly historyRepository: IOrderDeliveryHistoryRepository,
     private readonly prismaService: PrismaService,
   ) {}
 
@@ -53,7 +58,15 @@ export class SagaCreateOrdersHandler implements ICommandHandler<SagaCreateOrders
 
     // Transaction: tạo nhiều orders + orderItems phải atomic
     const orderIds = await this.prismaService.transaction(async (tx) => {
-      return this.orderRepository.saveMany(orders, tx)
+      const ids = await this.orderRepository.saveMany(orders, tx)
+      await this.historyRepository.createMany(
+        orders.map(order => OrderDeliveryHistory.create({
+          orderId: order.id,
+          orderedAt: order.createdAt,
+        })),
+        tx
+      )
+      return ids
     })
 
     return {

@@ -2,6 +2,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { Inject, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common'
 import { DispatchOrderCommand } from './dispatch-order.command'
 import { type IOrderRepository, ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interface'
+import type { IOrderDeliveryHistoryRepository } from '~/domain/repositories/order-delivery-history.repository.interface'
+import { ORDER_DELIVERY_HISTORY_REPOSITORY } from '~/domain/repositories/order-delivery-history.repository.interface'
 import type { IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
 import { OrderStatus } from '~/domain/enums/order.enum'
@@ -11,6 +13,9 @@ export class DispatchOrderHandler implements ICommandHandler<DispatchOrderComman
   constructor(
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepository,
+
+    @Inject(ORDER_DELIVERY_HISTORY_REPOSITORY)
+    private readonly historyRepository: IOrderDeliveryHistoryRepository,
 
     @Inject(MESSAGE_PUBLISHER)
     private readonly messagePublisher: IMessagePublisher,
@@ -49,5 +54,6 @@ export class DispatchOrderHandler implements ICommandHandler<DispatchOrderComman
 
     // 4. Cập nhật trạng thái sang SHIPPING
     await this.orderRepository.updateStatus(orderId, OrderStatus.SHIPPING)
+    await this.historyRepository.updateDispatchToCarrierAt(orderId, new Date())
   }
 }

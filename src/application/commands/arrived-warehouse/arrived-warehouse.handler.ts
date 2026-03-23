@@ -37,7 +37,7 @@ export class ArrivedWarehouseHandler implements ICommandHandler<ArrivedWarehouse
       }
 
       // 3. Upsert vào bảng OrderDeliveryHistory (chỉ append vào trường warehouses)
-      await this.historyRepository.upsertWarehouse(orderId, warehouseData, tx)
+      await this.historyRepository.updateWarehouse(orderId, warehouseData, tx)
     })
   }
 }

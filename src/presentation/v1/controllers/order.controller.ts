@@ -26,6 +26,7 @@ import { GetAdminOrdersQueryDto } from '~/presentation/dtos/get-admin-orders.dto
 import { GetOrderToShipperDto } from '~/presentation/dtos/order.dto'
 import { ArrivedWarehouseDto } from '~/presentation/dtos/warehouse.dto'
 import { GetOrderToShipperQuery } from '~/application/queries/get-order-to-shipper/get-order-to-shipper.query'
+import { GetOrderDeliveryHistoryQuery } from '~/application/queries/get-order-delivery-history/get-order-delivery-history.query'
 import { DeliverySuccessCommand } from '~/application/commands/delivery-success/delivery-success.command'
 import { DeliveryFailCommand } from '~/application/commands/delivery-fail/delivery-fail.command'
 import { RequestReturnOrderItemCommand } from '~/application/commands/request-return-order-item/request-return-order-item.command'
@@ -155,6 +156,17 @@ export class OrderController {
     )
 
     return { message: 'Đã cập nhật thông tin shipper', data: result }
+  }
+
+  @Get(':id/delivery-history')
+  async getOrderDeliveryHistory(
+    @Param('id', ParseUUIDPipe) orderId: string,
+  ) {
+    const result = await this.queryBus.execute(
+      new GetOrderDeliveryHistoryQuery(orderId),
+    )
+
+    return { message: 'Lấy lịch sử giao hàng thành công', data: result.data }
   }
 
   @Post(':id/delivery-success')

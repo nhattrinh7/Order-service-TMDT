@@ -20,6 +20,7 @@ import { DeliverySuccessHandler } from './commands/delivery-success/delivery-suc
 import { DeliveryFailHandler } from './commands/delivery-fail/delivery-fail.handler'
 import { RequestReturnOrderItemHandler } from './commands/request-return-order-item/request-return-order-item.command.handler'
 import { GetShopSettlementsHandler } from './queries/get-shop-settlements/get-shop-settlements.query.handler'
+import { GetOrderDeliveryHistoryHandler } from './queries/get-order-delivery-history/get-order-delivery-history.query.handler'
 
 const CommandHandlers = [
   CalculatePriceHandler,
@@ -42,6 +43,7 @@ const QueryHandlers = [
   GetAdminOrdersHandler,
   GetScannerWarehouseHandler,
   GetOrderToShipperHandler,
+  GetOrderDeliveryHistoryHandler,
   GetShopSettlementsHandler,
 ]
 

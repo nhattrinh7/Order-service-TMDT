@@ -132,11 +132,16 @@ model TransitWarehouse {
   @@map("transit_warehouses")
 }
 
+// còn thiếu trường acceptedAt để biết shop xác nhận đơn hàng tại thời điểm nào
 model OrderDeliveryHistory {
-  id         String @id @default(uuid()) @db.Uuid
-  orderId    String @map("order_id") @db.Uuid
-  warehouses Json?  @map("warehouse_history")
-  shipper    Json?
+  id                   String   @id @default(uuid()) @db.Uuid
+  orderId              String   @map("order_id") @db.Uuid
+  orderedAt            DateTime? @map("ordered_at")
+  dispatchToCarrierAt  DateTime? @map("dispatch_to_carrier_at")
+  warehouses           Json?    @map("warehouse_history")
+  shipper              Json?
+  deliverySuccessAt    DateTime? @map("delivery_success_at")
+  deliveryFailAt       DateTime? @map("delivery_fail_at")
 
   @@map("order_delivery_histories")
 }

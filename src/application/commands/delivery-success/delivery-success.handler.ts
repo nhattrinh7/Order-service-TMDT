@@ -6,14 +6,22 @@ import { OrderStatus } from '~/domain/enums/order.enum'
 import type { IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
 import { PrismaService } from '~/infrastructure/database/prisma/prisma.service'
-import { OrderStatus as PrismaOrderStatus, PaymentMethod, PayoutStatus } from '@prisma/client'
+import { OrderStatus as PrismaOrderStatus } from '@prisma/client'
 import { env } from '~/configs/env.config'
+import type { IOrderDeliveryHistoryRepository } from '~/domain/repositories/order-delivery-history.repository.interface'
+import { ORDER_DELIVERY_HISTORY_REPOSITORY } from '~/domain/repositories/order-delivery-history.repository.interface'
+import { Settlement } from '~/domain/entities/settlement.entity'
+import { SettlementMapper } from '~/infrastructure/database/mappers/settlement.mapper'
+import { SettlementPaymentMethod, SettlementStatus } from '~/domain/enums/settlement.enum'
 
 @CommandHandler(DeliverySuccessCommand)
 export class DeliverySuccessHandler implements ICommandHandler<DeliverySuccessCommand> {
   constructor(
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepository,
+
+    @Inject(ORDER_DELIVERY_HISTORY_REPOSITORY)
+    private readonly historyRepository: IOrderDeliveryHistoryRepository,
 
     @Inject(MESSAGE_PUBLISHER)
     private readonly messagePublisher: IMessagePublisher,
@@ -30,7 +38,7 @@ export class DeliverySuccessHandler implements ICommandHandler<DeliverySuccessCo
     }
 
     // 1. Kiểm tra đơn hàng có tồn tại không
-    const order = await this.orderRepository.findById(orderId)
+    const order = await this.orderRepository.findByIdWithItems(orderId)
     if (!order) {
       throw new NotFoundException(`Không tìm thấy đơn hàng với id: ${orderId}`)
     }
@@ -45,6 +53,16 @@ export class DeliverySuccessHandler implements ICommandHandler<DeliverySuccessCo
         `Chỉ đơn hàng đang Giao hàng (SHIPPING) mới có thể đánh dấu là Đã giao thành công (DELIVERY_COMPLETED). Trạng thái hiện tại: ${order.status}`,
       )
     }
+
+    const quantities = new Map<string, number>()
+    for (const item of order.orderItems) {
+      const current = quantities.get(item.productVariantId) ?? 0
+      quantities.set(item.productVariantId, current + item.quantity)
+    }
+    const inventoryItems = Array.from(quantities.entries()).map(([productVariantId, quantity]) => ({
+      productVariantId,
+      quantity,
+    }))
 
     const shopResponse = await this.messagePublisher.sendToShopService<
       { shopIds: string[] },
@@ -78,24 +96,38 @@ export class DeliverySuccessHandler implements ICommandHandler<DeliverySuccessCo
         },
       })
 
-      // 4. Tạo bản ghi settlement
+      // 4. Cập nhật lịch sử giao hàng
+      await this.historyRepository.updateDeliverySuccessAt(orderId, now, tx)
+
+      // 5. Tạo bản ghi settlement
+      const settlement = Settlement.create({
+        orderId: order.id,
+        shopId: order.shopId,
+        goodsPrice: order.goodsPrice,
+        finalPrice: order.finalPrice,
+        shippingFee: order.shippingFee,
+        commissionFee,
+        payout,
+        paymentMethod: SettlementPaymentMethod.WALLET,
+        status: SettlementStatus.COMPLETED,
+        payoutAt: now,
+        createdAt: now,
+        updatedAt: now,
+      })
+
       await tx.settlement.create({
-        data: {
-          orderId: order.id,
-          shopId: order.shopId,
-          goodsPrice: order.goodsPrice,
-          finalPrice: order.finalPrice,
-          shippingFee: order.shippingFee,
-          commissionFee,
-          payout,
-          paymentMethod: PaymentMethod.WALLET,
-          status: PayoutStatus.COMPLETED,
-          payoutAt: now,
-        },
+        data: SettlementMapper.toPersistence(settlement),
       })
     })
 
-    // 5. Cộng commissionFee vào ví superadmin và payout vào ví shop
+    if (inventoryItems.length > 0) {
+      this.messagePublisher.emitToInventoryService('inventory.delivery-success', {
+        orderId: order.id,
+        items: inventoryItems,
+      })
+    }
+
+    // 6. Cộng commissionFee vào ví superadmin và payout vào ví shop
     this.messagePublisher.emitToUserService('refund.wallet', {
       userId: superAdminId,
       amount: commissionFee,
