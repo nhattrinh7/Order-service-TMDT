@@ -1,7 +1,8 @@
-﻿import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
+import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { GetShopSettlementsQuery } from './get-shop-settlements.query'
 import { PrismaService } from '~/infrastructure/database/prisma/prisma.service'
 import { PayoutStatus } from '@prisma/client'
+import { DAY_START_TIME_SUFFIX, DAY_END_TIME_SUFFIX } from '~/common/constants/constant'
 
 interface SettlementResponse {
   orderId: string
@@ -24,8 +25,8 @@ export class GetShopSettlementsHandler implements IQueryHandler<GetShopSettlemen
     const { shopId, page, limit, status, startDate, endDate } = query
     const skip = (page - 1) * limit
 
-    const start = new Date(`${startDate}T00:00:00`)
-    const end = new Date(`${endDate}T23:59:59.999`)
+    const start = new Date(`${startDate}${DAY_START_TIME_SUFFIX}`)
+    const end = new Date(`${endDate}${DAY_END_TIME_SUFFIX}`)
 
     const where = {
       shopId,

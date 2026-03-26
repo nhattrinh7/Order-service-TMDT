@@ -6,6 +6,7 @@ import type { IMessagePublisher } from '~/domain/contracts/message-publisher.int
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
 import { OrderStatus } from '~/domain/enums/order.enum'
 import { encodeCursor, decodeCursor } from '~/common/utils/cursor.util'
+import { SHOP_FALLBACK_NAME_PREFIX } from '~/common/constants/constant'
 
 interface OrderItemResponse {
   id: string
@@ -98,16 +99,12 @@ export class GetUserOrdersHandler implements IQueryHandler<GetUserOrdersQuery> {
         })
       })
       const reviewPairs = Array.from(reviewPairsMap.values())
-      
-      console.log('reviewPairs', reviewPairs)
 
       if (reviewPairs.length > 0) {
         const reviewedPairs = await this.messagePublisher.sendToCatalogService<
           { items: Array<{ orderId: string; productId: string }> },
           Array<{ orderId: string; productId: string }>
         >('get.reviewed.order-items', { items: reviewPairs })
-
-        console.log('reviewedPairs', reviewedPairs)
 
         reviewedPairs.forEach(pair => {
           reviewedKeySet.add(`${pair.orderId}:${pair.productId}`)
@@ -121,7 +118,7 @@ export class GetUserOrdersHandler implements IQueryHandler<GetUserOrdersQuery> {
       return {
         id: order.id,
         shopId: order.shopId,
-        shopName: shopInfo?.name || `Shop ${order.shopId.slice(0, 6)}`,
+        shopName: shopInfo?.name || `${SHOP_FALLBACK_NAME_PREFIX} ${order.shopId.slice(0, 6)}`,
         status: order.status,
         paymentMethod: order.paymentMethod,
         goodsPrice: order.goodsPrice,

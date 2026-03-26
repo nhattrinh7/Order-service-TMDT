@@ -4,6 +4,7 @@ import { GetShopOrdersQuery } from './get-shop-orders.query'
 import { type IOrderRepository, ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interface'
 import type { IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
+import { SHOP_FALLBACK_NAME_PREFIX } from '~/common/constants/constant'
 
 interface OrderItemResponse {
   id: string
@@ -64,7 +65,7 @@ export class GetShopOrdersHandler implements IQueryHandler<GetShopOrdersQuery> {
     const totalPages = Math.ceil(totalItems / limit)
 
     // Lấy shopName từ shop-service
-    let shopName = `Shop ${shopId.slice(0, 6)}`
+    let shopName = `${SHOP_FALLBACK_NAME_PREFIX} ${shopId.slice(0, 6)}`
 
     const shopsResponse = await this.messagePublisher.sendToShopService<
       { shopIds: string[] },
