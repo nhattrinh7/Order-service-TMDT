@@ -31,6 +31,7 @@
     "amqp-connection-manager": "^5.0.0",
     "amqplib": "^0.10.9",
     "bcryptjs": "^3.0.3",
+    "helmet": "^7.0.0",
     "joi": "^18.0.1",
     "nestjs-zod": "^5.0.1",
     "qrcode": "^1.5.4",
