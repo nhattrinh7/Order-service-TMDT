@@ -61,6 +61,9 @@ model Order {
   orderItems OrderItem[]
   settlement Settlement?
 
+  @@index([userId, status, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([shopId, status, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([status, createdAt(sort: Desc)])
   @@map("orders")
 }
 
@@ -81,6 +84,8 @@ model OrderItem {
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
+  @@index([orderId])
+  @@index([returnStatus, orderId])
   @@map("order_items")
 }
 
@@ -143,6 +148,7 @@ model OrderDeliveryHistory {
   deliverySuccessAt    DateTime? @map("delivery_success_at")
   deliveryFailAt       DateTime? @map("delivery_fail_at")
 
+  @@index([orderId])
   @@map("order_delivery_histories")
 }
 
