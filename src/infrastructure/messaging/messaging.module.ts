@@ -14,7 +14,7 @@ import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-ord
         name: 'NOTIFICATION_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'notification_queue',
           persistent: true,
         },
@@ -23,7 +23,7 @@ import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-ord
         name: 'USER_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'user_queue',
           persistent: true,
         },
@@ -32,7 +32,7 @@ import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-ord
         name: 'SHOP_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'shop_queue',
           persistent: true,
         },
@@ -41,7 +41,7 @@ import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-ord
         name: 'CATALOG_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'catalog_queue',
           persistent: true,
         },
@@ -50,7 +50,7 @@ import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-ord
         name: 'INVENTORY_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'inventory_queue',
           persistent: true,
         },
@@ -59,7 +59,7 @@ import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-ord
         name: 'VOUCHER_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'voucher_queue',
           persistent: true,
         },
@@ -68,7 +68,7 @@ import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-ord
         name: 'SAGA_CLIENT',
         transport: Transport.RMQ,
         options: {
-          urls: ['amqp://admin:admin123@localhost:5672'],
+          urls: [`amqp://admin:admin123@${process.env.RABBITMQ_HOST || 'localhost'}:5672`],
           queue: 'saga_queue',
           persistent: true,
         },
