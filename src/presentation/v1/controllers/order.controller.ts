@@ -145,7 +145,7 @@ export class OrderController {
     return { message: 'Đã cập nhật trạng thái đơn hàng đến kho' }
   }
 
-  @Get(':id/shipper')
+  @Post(':id/shipper')
   async getOrderToShipper(
     @Param('id', ParseUUIDPipe) orderId: string,
     @Headers('x-user-id') shipperId: string,
