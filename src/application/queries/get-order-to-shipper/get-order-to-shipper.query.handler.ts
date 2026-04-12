@@ -28,7 +28,7 @@ export class GetOrderToShipperHandler implements IQueryHandler<GetOrderToShipper
   async execute(query: GetOrderToShipperQuery): Promise<any> {
     const { orderId, shipperName, shipperPhoneNumber } = query
 
-    const order = await this.prismaService.transaction(async (tx) => {
+    const order = await this.prismaService.transaction(async tx => {
       // 1. Get order with items
       const orderData = await this.orderRepository.findByIdWithItems(orderId, tx)
       if (!orderData) {
@@ -39,9 +39,9 @@ export class GetOrderToShipperHandler implements IQueryHandler<GetOrderToShipper
       const shipperData = {
         name: shipperName,
         phoneNumber: shipperPhoneNumber,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
       }
-      
+
       await this.historyRepository.updateShipper(orderId, shipperData, tx)
 
       return orderData
@@ -55,9 +55,7 @@ export class GetOrderToShipperHandler implements IQueryHandler<GetOrderToShipper
     >('get.shop.delivery_info', { shopId: order.shopId })
 
     // // Lấy price theo requirement: "hoặc 0 nếu đã thanh toán"
-    const price = order.paymentMethod === 'COD' 
-      ? order.finalPrice 
-      : 0
+    const price = order.paymentMethod === 'COD' ? order.finalPrice : 0
 
     // 4. Format Output
     return {
@@ -79,8 +77,8 @@ export class GetOrderToShipperHandler implements IQueryHandler<GetOrderToShipper
           name: item.productName,
           sku: item.sku,
           quantity: item.quantity,
-        }))
-      }
+        })),
+      },
     }
   }
 }

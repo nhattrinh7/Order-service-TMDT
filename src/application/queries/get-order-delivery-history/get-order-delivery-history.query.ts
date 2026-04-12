@@ -1,5 +1,3 @@
 export class GetOrderDeliveryHistoryQuery {
-  constructor(
-    public readonly orderId: string,
-  ) {}
+  constructor(public readonly orderId: string) {}
 }

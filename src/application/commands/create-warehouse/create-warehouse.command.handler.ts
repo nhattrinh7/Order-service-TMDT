@@ -1,15 +1,15 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { CreateWarehouseCommand } from './create-warehouse.command'
 import { ConflictException, Inject } from '@nestjs/common'
-import { WAREHOUSE_REPOSITORY, type IWarehouseRepository } from '~/domain/repositories/warehouse.repository.interface'
-
-
+import {
+  WAREHOUSE_REPOSITORY,
+  type IWarehouseRepository,
+} from '~/domain/repositories/warehouse.repository.interface'
 
 @CommandHandler(CreateWarehouseCommand)
 export class CreateWarehouseHandler implements ICommandHandler<CreateWarehouseCommand> {
   constructor(
     @Inject(WAREHOUSE_REPOSITORY)
-
     private readonly warehouseRepository: IWarehouseRepository,
   ) {}
 
@@ -28,7 +28,6 @@ export class CreateWarehouseHandler implements ICommandHandler<CreateWarehouseCo
       name,
       address,
     })
-
 
     return newWarehouse
   }

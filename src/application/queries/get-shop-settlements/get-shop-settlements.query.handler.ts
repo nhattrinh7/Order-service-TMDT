@@ -17,9 +17,7 @@ interface SettlementResponse {
 
 @QueryHandler(GetShopSettlementsQuery)
 export class GetShopSettlementsHandler implements IQueryHandler<GetShopSettlementsQuery> {
-  constructor(
-    private readonly prismaService: PrismaService,
-  ) {}
+  constructor(private readonly prismaService: PrismaService) {}
 
   async execute(query: GetShopSettlementsQuery) {
     const { shopId, page, limit, status, startDate, endDate } = query

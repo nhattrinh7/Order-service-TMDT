@@ -23,4 +23,5 @@ export const OrderItemReturnStatus = {
   NONE: 'NONE',
   REFUNDED: 'REFUNDED',
 } as const
-export type OrderItemReturnStatus = (typeof OrderItemReturnStatus)[keyof typeof OrderItemReturnStatus]
+export type OrderItemReturnStatus =
+  (typeof OrderItemReturnStatus)[keyof typeof OrderItemReturnStatus]

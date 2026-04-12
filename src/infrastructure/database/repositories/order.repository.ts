@@ -4,7 +4,10 @@ import { IOrderRepository, OrderWithItems } from '~/domain/repositories/order.re
 import { Order } from '~/domain/entities/order.entity'
 import { OrderMapper } from '~/infrastructure/database/mappers/order.mapper'
 import { OrderStatus, OrderItemReturnStatus } from '~/domain/enums/order.enum'
-import { OrderStatus as PrismaOrderStatus, OrderItemReturnStatus as PrismaOrderItemReturnStatus } from '@prisma/client'
+import {
+  OrderStatus as PrismaOrderStatus,
+  OrderItemReturnStatus as PrismaOrderItemReturnStatus,
+} from '@prisma/client'
 
 @Injectable()
 export class OrderRepository implements IOrderRepository {
@@ -81,8 +84,8 @@ export class OrderRepository implements IOrderRepository {
     const prismaOrder = await client.order.findUnique({
       where: { id: orderId },
       include: {
-        orderItems: true
-      }
+        orderItems: true,
+      },
     })
 
     if (!prismaOrder) return null
@@ -160,7 +163,11 @@ export class OrderRepository implements IOrderRepository {
     }))
   }
 
-  async countByStatus(status: OrderStatus, search?: string, returnStatus?: OrderItemReturnStatus): Promise<number> {
+  async countByStatus(
+    status: OrderStatus,
+    search?: string,
+    returnStatus?: OrderItemReturnStatus,
+  ): Promise<number> {
     const where: any = {
       status: status as unknown as PrismaOrderStatus,
     }
@@ -279,7 +286,12 @@ export class OrderRepository implements IOrderRepository {
     }))
   }
 
-  async countByShopId(shopId: string, status: OrderStatus, search?: string, returnStatus?: OrderItemReturnStatus): Promise<number> {
+  async countByShopId(
+    shopId: string,
+    status: OrderStatus,
+    search?: string,
+    returnStatus?: OrderItemReturnStatus,
+  ): Promise<number> {
     const where: any = {
       shopId,
       status: status as unknown as PrismaOrderStatus,
@@ -402,7 +414,7 @@ export class OrderRepository implements IOrderRepository {
   }
 
   async findOrderItemByIdWithOrder(orderItemId: string) {
-    return await this.prisma.orderItem.findUnique({
+    return (await this.prisma.orderItem.findUnique({
       where: { id: orderItemId },
       select: {
         id: true,
@@ -416,7 +428,7 @@ export class OrderRepository implements IOrderRepository {
           },
         },
       },
-    }) as any
+    })) as any
   }
 
   async updateOrderItemReturnRequest(orderItemId: string, returnReason: string): Promise<void> {

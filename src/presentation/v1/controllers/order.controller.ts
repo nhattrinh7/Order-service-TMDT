@@ -40,9 +40,7 @@ export class OrderController {
   ) {}
 
   @Get()
-  async getAdminOrders(
-    @Query() query: GetAdminOrdersQueryDto,
-  ) {
+  async getAdminOrders(@Query() query: GetAdminOrdersQueryDto) {
     return this.queryBus.execute(
       new GetAdminOrdersQuery(
         query.page,
@@ -53,7 +51,7 @@ export class OrderController {
       ),
     )
   }
-  
+
   @Get('users/:userId')
   async getUserOrders(
     @Param('userId', ParseUUIDPipe) userId: string,
@@ -70,12 +68,7 @@ export class OrderController {
     @Headers('x-user-id') userId: string,
   ) {
     const result = await this.commandBus.execute(
-      new CalculatePriceCommand(
-        body.itemsByShop,
-        userId,
-        body.szoneVoucherId,
-        body.shopVouchers
-      )
+      new CalculatePriceCommand(body.itemsByShop, userId, body.szoneVoucherId, body.shopVouchers),
     )
 
     return result
@@ -87,9 +80,7 @@ export class OrderController {
     @Headers('x-user-id') userId: string,
     @Body() body: CancelOrderDto,
   ) {
-    return this.commandBus.execute(
-      new CancelOrderCommand(orderId, userId, body.cancelReason),
-    )
+    return this.commandBus.execute(new CancelOrderCommand(orderId, userId, body.cancelReason))
   }
 
   @Patch(':orderId/accept')
@@ -97,9 +88,7 @@ export class OrderController {
     @Param('orderId', ParseUUIDPipe) orderId: string,
     @Headers('x-user-id') userId: string,
   ) {
-    await this.commandBus.execute(
-      new AcceptOrderCommand(orderId, userId),
-    )
+    await this.commandBus.execute(new AcceptOrderCommand(orderId, userId))
 
     return { message: 'Xác nhận đơn hàng thành công' }
   }
@@ -109,9 +98,7 @@ export class OrderController {
     @Param('orderId', ParseUUIDPipe) orderId: string,
     @Headers('x-user-id') userId: string,
   ) {
-    await this.commandBus.execute(
-      new DispatchOrderCommand(orderId, userId),
-    )
+    await this.commandBus.execute(new DispatchOrderCommand(orderId, userId))
 
     return { message: 'Đã cập nhật trạng thái giao đơn vị vận chuyển' }
   }
@@ -138,9 +125,7 @@ export class OrderController {
     @Param('id', ParseUUIDPipe) orderId: string,
     @Body() body: ArrivedWarehouseDto,
   ) {
-    await this.commandBus.execute(
-      new ArrivedWarehouseCommand(orderId, body.name, body.address),
-    )
+    await this.commandBus.execute(new ArrivedWarehouseCommand(orderId, body.name, body.address))
 
     return { message: 'Đã cập nhật trạng thái đơn hàng đến kho' }
   }
@@ -159,29 +144,20 @@ export class OrderController {
   }
 
   @Get(':id/delivery-history')
-  async getOrderDeliveryHistory(
-    @Param('id', ParseUUIDPipe) orderId: string,
-  ) {
-    const result = await this.queryBus.execute(
-      new GetOrderDeliveryHistoryQuery(orderId),
-    )
+  async getOrderDeliveryHistory(@Param('id', ParseUUIDPipe) orderId: string) {
+    const result = await this.queryBus.execute(new GetOrderDeliveryHistoryQuery(orderId))
 
     return { message: 'Lấy lịch sử giao hàng thành công', data: result.data }
   }
 
   @Post(':id/delivery-success')
-  async deliverySuccess(
-    @Param('id', ParseUUIDPipe) id: string,
-    @Body('shopId') shopId: string,
-  ) {
+  async deliverySuccess(@Param('id', ParseUUIDPipe) id: string, @Body('shopId') shopId: string) {
     await this.commandBus.execute(new DeliverySuccessCommand(id, shopId))
     return { message: 'Đơn hàng đã được đánh dấu giao thành công' }
   }
 
   @Post(':id/delivery-fail')
-  async deliveryFail(
-    @Param('id', ParseUUIDPipe) id: string
-  ) {
+  async deliveryFail(@Param('id', ParseUUIDPipe) id: string) {
     await this.commandBus.execute(new DeliveryFailCommand(id))
     return { message: 'Đơn hàng đã được đánh dấu giao thất bại' }
   }

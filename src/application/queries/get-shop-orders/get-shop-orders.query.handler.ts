@@ -1,7 +1,10 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { Inject } from '@nestjs/common'
 import { GetShopOrdersQuery } from './get-shop-orders.query'
-import { type IOrderRepository, ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interface'
+import {
+  type IOrderRepository,
+  ORDER_REPOSITORY,
+} from '~/domain/repositories/order.repository.interface'
 import type { IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
 import { SHOP_FALLBACK_NAME_PREFIX } from '~/common/constants/constant'
@@ -71,11 +74,10 @@ export class GetShopOrdersHandler implements IQueryHandler<GetShopOrdersQuery> {
       { shopIds: string[] },
       Array<{ id: string; name: string; logo: string | null }>
     >('get.shop.simple_data', { shopIds: [shopId] })
-    
+
     if (shopsResponse && shopsResponse.length > 0) {
       shopName = shopsResponse[0].name
     }
-
 
     // Lấy buyerUsername từ user-service
     const userIds = [...new Set(orders.map(order => order.userId))]

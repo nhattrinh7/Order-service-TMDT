@@ -1,4 +1,7 @@
-import { PaymentMethod as PrismaPaymentMethod, PayoutStatus as PrismaPayoutStatus } from '@prisma/client'
+import {
+  PaymentMethod as PrismaPaymentMethod,
+  PayoutStatus as PrismaPayoutStatus,
+} from '@prisma/client'
 import { Settlement } from '~/domain/entities/settlement.entity'
 
 export class SettlementMapper {

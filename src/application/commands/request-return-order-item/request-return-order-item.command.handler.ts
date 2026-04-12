@@ -1,12 +1,20 @@
 import { BadRequestException, ForbiddenException, Inject, NotFoundException } from '@nestjs/common'
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { RequestReturnOrderItemCommand } from './request-return-order-item.command'
-import { ORDER_REPOSITORY, type IOrderRepository } from '~/domain/repositories/order.repository.interface'
+import {
+  ORDER_REPOSITORY,
+  type IOrderRepository,
+} from '~/domain/repositories/order.repository.interface'
 import { OrderItemReturnStatus, OrderStatus } from '~/domain/enums/order.enum'
-import { MESSAGE_PUBLISHER, type IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
+import {
+  MESSAGE_PUBLISHER,
+  type IMessagePublisher,
+} from '~/domain/contracts/message-publisher.interface'
 
 @CommandHandler(RequestReturnOrderItemCommand)
-export class RequestReturnOrderItemHandler implements ICommandHandler<RequestReturnOrderItemCommand> {
+export class RequestReturnOrderItemHandler
+  implements ICommandHandler<RequestReturnOrderItemCommand>
+{
   constructor(
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepository,

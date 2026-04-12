@@ -22,7 +22,7 @@ export class ArrivedWarehouseHandler implements ICommandHandler<ArrivedWarehouse
   async execute(command: ArrivedWarehouseCommand): Promise<void> {
     const { orderId, name, address } = command
 
-    await this.prismaService.transaction(async (tx) => {
+    await this.prismaService.transaction(async tx => {
       // 1. Kiểm tra đơn hàng có tồn tại không
       const order = await this.orderRepository.findById(orderId, tx)
       if (!order) {
@@ -33,7 +33,7 @@ export class ArrivedWarehouseHandler implements ICommandHandler<ArrivedWarehouse
       const warehouseData = {
         name,
         address,
-        time: new Date().toISOString()
+        time: new Date().toISOString(),
       }
 
       // 3. Upsert vào bảng OrderDeliveryHistory (chỉ append vào trường warehouses)

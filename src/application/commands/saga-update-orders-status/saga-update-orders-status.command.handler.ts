@@ -6,7 +6,9 @@ import { ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interfa
 import { OrderStatus } from '~/domain/enums/order.enum'
 
 @CommandHandler(SagaUpdateOrdersStatusCommand)
-export class SagaUpdateOrdersStatusHandler implements ICommandHandler<SagaUpdateOrdersStatusCommand> {
+export class SagaUpdateOrdersStatusHandler
+  implements ICommandHandler<SagaUpdateOrdersStatusCommand>
+{
   constructor(
     @Inject(ORDER_REPOSITORY)
     private readonly orderRepository: IOrderRepository,

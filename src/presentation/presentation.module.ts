@@ -11,6 +11,5 @@ import { SettlementController } from '~/presentation/v1/controllers/settlement.c
   imports: [CqrsModule, ApplicationModule, MessagingModule],
   controllers: [OrderController, ScannerController, WarehouseController, SettlementController],
   exports: [],
-
 })
 export class PresentationModule {}

@@ -2,7 +2,7 @@ import { Order } from '~/domain/entities/order.entity'
 import { OrderDto } from '~/presentation/dtos/order.dto'
 
 export class OrderMapper {
-  static toOrderResponse (order: Order): OrderDto {
+  static toOrderResponse(order: Order): OrderDto {
     return {
       id: order.id,
       paymentId: order.paymentId,
@@ -22,6 +22,6 @@ export class OrderMapper {
       cancelReason: order.cancelReason,
       createdAt: order.createdAt,
       updatedAt: order.updatedAt,
-    } 
+    }
   }
 }

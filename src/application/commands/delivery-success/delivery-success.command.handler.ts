@@ -1,7 +1,15 @@
 ﻿import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
-import { Inject, NotFoundException, BadRequestException, InternalServerErrorException } from '@nestjs/common'
+import {
+  Inject,
+  NotFoundException,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common'
 import { DeliverySuccessCommand } from './delivery-success.command'
-import { type IOrderRepository, ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interface'
+import {
+  type IOrderRepository,
+  ORDER_REPOSITORY,
+} from '~/domain/repositories/order.repository.interface'
 import { OrderStatus } from '~/domain/enums/order.enum'
 import type { IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
@@ -74,11 +82,11 @@ export class DeliverySuccessHandler implements ICommandHandler<DeliverySuccessCo
     }
 
     const shopOwnerId = shopResponse[0].ownerId
-    const commissionFee = Math.floor(order.goodsPrice * 5 / 100)
+    const commissionFee = Math.floor((order.goodsPrice * 5) / 100)
     const payout = order.finalPrice - commissionFee
     const now = new Date()
 
-    await this.prismaService.transaction(async (tx) => {
+    await this.prismaService.transaction(async tx => {
       const existingSettlement = await tx.settlement.findUnique({
         where: { orderId },
       })

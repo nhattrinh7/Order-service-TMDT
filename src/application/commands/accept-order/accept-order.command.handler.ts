@@ -1,7 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { Inject, NotFoundException, ForbiddenException, BadRequestException } from '@nestjs/common'
 import { AcceptOrderCommand } from './accept-order.command'
-import { type IOrderRepository, ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interface'
+import {
+  type IOrderRepository,
+  ORDER_REPOSITORY,
+} from '~/domain/repositories/order.repository.interface'
 import type { IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
 import { OrderStatus } from '~/domain/enums/order.enum'
@@ -42,9 +45,7 @@ export class AcceptOrderHandler implements ICommandHandler<AcceptOrderCommand> {
 
     // 3. Kiểm tra trạng thái phải là AWAITING_CONFIRMATION
     if (order.status !== OrderStatus.AWAITING_CONFIRMATION) {
-      throw new BadRequestException(
-        'Chỉ có thể xác nhận đơn hàng đang ở trạng thái chờ xác nhận',
-      )
+      throw new BadRequestException('Chỉ có thể xác nhận đơn hàng đang ở trạng thái chờ xác nhận')
     }
 
     // 4. Cập nhật trạng thái sang PREPARING

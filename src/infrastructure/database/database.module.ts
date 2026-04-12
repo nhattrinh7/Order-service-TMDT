@@ -8,7 +8,6 @@ import { ORDER_DELIVERY_HISTORY_REPOSITORY } from '~/domain/repositories/order-d
 import { OrderDeliveryHistoryRepository } from '~/infrastructure/database/repositories/order-delivery-history.repository'
 import { CqrsModule } from '@nestjs/cqrs'
 
-
 @Module({
   imports: [CqrsModule],
   providers: [
@@ -25,7 +24,6 @@ import { CqrsModule } from '@nestjs/cqrs'
       provide: ORDER_DELIVERY_HISTORY_REPOSITORY,
       useClass: OrderDeliveryHistoryRepository,
     },
-    
   ],
 
   exports: [
@@ -34,6 +32,5 @@ import { CqrsModule } from '@nestjs/cqrs'
     WAREHOUSE_REPOSITORY,
     ORDER_DELIVERY_HISTORY_REPOSITORY,
   ],
-
 })
 export class DatabaseModule {}

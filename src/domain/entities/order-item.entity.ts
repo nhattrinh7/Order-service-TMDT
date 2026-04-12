@@ -42,18 +42,42 @@ export class OrderItem {
     })
   }
 
-  get id(): string { return this.props.id }
-  get productId(): string { return this.props.productId }
-  get productVariantId(): string { return this.props.productVariantId }
-  get productName(): string { return this.props.productName }
-  get variantImage(): string { return this.props.variantImage }
-  get sku(): string { return this.props.sku }
-  get quantity(): number { return this.props.quantity }
-  get finalPrice(): number { return this.props.finalPrice }
-  get returnReason(): string | null { return this.props.returnReason }
-  get returnStatus(): OrderItemReturnStatus { return this.props.returnStatus }
-  get returnRequestedAt(): Date | null { return this.props.returnRequestedAt }
-  get returnResolvedAt(): Date | null { return this.props.returnResolvedAt }
+  get id(): string {
+    return this.props.id
+  }
+  get productId(): string {
+    return this.props.productId
+  }
+  get productVariantId(): string {
+    return this.props.productVariantId
+  }
+  get productName(): string {
+    return this.props.productName
+  }
+  get variantImage(): string {
+    return this.props.variantImage
+  }
+  get sku(): string {
+    return this.props.sku
+  }
+  get quantity(): number {
+    return this.props.quantity
+  }
+  get finalPrice(): number {
+    return this.props.finalPrice
+  }
+  get returnReason(): string | null {
+    return this.props.returnReason
+  }
+  get returnStatus(): OrderItemReturnStatus {
+    return this.props.returnStatus
+  }
+  get returnRequestedAt(): Date | null {
+    return this.props.returnRequestedAt
+  }
+  get returnResolvedAt(): Date | null {
+    return this.props.returnResolvedAt
+  }
 
   toPlainObject(): OrderItemProps {
     return { ...this.props }

@@ -16,22 +16,19 @@ export class OrderDeliveryHistoryRepository implements IOrderDeliveryHistoryRepo
     })
   }
 
-  async createMany(
-    histories: OrderDeliveryHistory[],
-    tx?: any
-  ): Promise<void> {
+  async createMany(histories: OrderDeliveryHistory[], tx?: any): Promise<void> {
     if (histories.length === 0) return
 
     const prisma = tx || this.prisma
     await prisma.orderDeliveryHistory.createMany({
-      data: histories.map(history => OrderDeliveryHistoryMapper.toPersistence(history))
+      data: histories.map(history => OrderDeliveryHistoryMapper.toPersistence(history)),
     })
   }
 
   async updateWarehouse(
     orderId: string,
     warehouse: { name: string; address: string; time: string },
-    tx?: any
+    tx?: any,
   ): Promise<void> {
     const prisma = tx || this.prisma
     const history = await this.findByOrderId(orderId, tx)
@@ -40,22 +37,20 @@ export class OrderDeliveryHistoryRepository implements IOrderDeliveryHistoryRepo
       throw new NotFoundException(`Khong tim thay lich su giao hang voi orderId: ${orderId}`)
     }
 
-    const currentWarehouses = Array.isArray(history.warehouses) 
-      ? history.warehouses 
-      : []
+    const currentWarehouses = Array.isArray(history.warehouses) ? history.warehouses : []
 
     await prisma.orderDeliveryHistory.update({
       where: { id: history.id },
       data: {
-        warehouses: [...currentWarehouses, warehouse as any]
-      }
+        warehouses: [...currentWarehouses, warehouse as any],
+      },
     })
   }
 
   async updateShipper(
     orderId: string,
     shipper: { name: string; phoneNumber: string; time: string },
-    tx?: any
+    tx?: any,
   ): Promise<void> {
     const prisma = tx || this.prisma
     const history = await this.findByOrderId(orderId, tx)
@@ -67,12 +62,16 @@ export class OrderDeliveryHistoryRepository implements IOrderDeliveryHistoryRepo
     await prisma.orderDeliveryHistory.update({
       where: { id: history.id },
       data: {
-        shipper: shipper as any
-      }
+        shipper: shipper as any,
+      },
     })
   }
 
-  async updateDispatchToCarrierAt(orderId: string, dispatchToCarrierAt: Date, tx?: any): Promise<void> {
+  async updateDispatchToCarrierAt(
+    orderId: string,
+    dispatchToCarrierAt: Date,
+    tx?: any,
+  ): Promise<void> {
     const prisma = tx || this.prisma
     const history = await this.findByOrderId(orderId, tx)
 
@@ -83,8 +82,8 @@ export class OrderDeliveryHistoryRepository implements IOrderDeliveryHistoryRepo
     await prisma.orderDeliveryHistory.update({
       where: { id: history.id },
       data: {
-        dispatchToCarrierAt
-      }
+        dispatchToCarrierAt,
+      },
     })
   }
 
@@ -99,8 +98,8 @@ export class OrderDeliveryHistoryRepository implements IOrderDeliveryHistoryRepo
     await prisma.orderDeliveryHistory.update({
       where: { id: history.id },
       data: {
-        deliverySuccessAt
-      }
+        deliverySuccessAt,
+      },
     })
   }
 
@@ -115,8 +114,8 @@ export class OrderDeliveryHistoryRepository implements IOrderDeliveryHistoryRepo
     await prisma.orderDeliveryHistory.update({
       where: { id: history.id },
       data: {
-        deliveryFailAt
-      }
+        deliveryFailAt,
+      },
     })
   }
 }

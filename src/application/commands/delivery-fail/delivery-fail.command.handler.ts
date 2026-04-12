@@ -1,7 +1,10 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs'
 import { Inject, NotFoundException, BadRequestException } from '@nestjs/common'
 import { DeliveryFailCommand } from './delivery-fail.command'
-import { type IOrderRepository, ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interface'
+import {
+  type IOrderRepository,
+  ORDER_REPOSITORY,
+} from '~/domain/repositories/order.repository.interface'
 import { OrderStatus, OrderPaymentMethod } from '~/domain/enums/order.enum'
 import type { IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'

@@ -8,12 +8,8 @@ export class WarehouseController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @Post()
-  async createWarehouse(
-    @Body() body: CreateWarehouseDto
-  ) {
-    const result = await this.commandBus.execute(
-      new CreateWarehouseCommand(body),
-    )
+  async createWarehouse(@Body() body: CreateWarehouseDto) {
+    const result = await this.commandBus.execute(new CreateWarehouseCommand(body))
     return { message: 'Create warehouse successfully', data: result }
   }
 }

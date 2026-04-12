@@ -47,21 +47,11 @@ const QueryHandlers = [
   GetShopSettlementsHandler,
 ]
 
-const EventHandlers = [
+const EventHandlers = []
 
-]
- 
 @Module({
-  imports: [
-    CqrsModule,
-    DatabaseModule,
-    MessagingModule
-  ],
-  providers: [
-    ...CommandHandlers,
-    ...QueryHandlers,
-    ...EventHandlers,
-  ],
+  imports: [CqrsModule, DatabaseModule, MessagingModule],
+  providers: [...CommandHandlers, ...QueryHandlers, ...EventHandlers],
   exports: [],
 })
 export class ApplicationModule {}

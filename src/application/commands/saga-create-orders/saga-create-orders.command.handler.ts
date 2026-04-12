@@ -21,7 +21,9 @@ export class SagaCreateOrdersHandler implements ICommandHandler<SagaCreateOrders
     private readonly prismaService: PrismaService,
   ) {}
 
-  async execute(command: SagaCreateOrdersCommand): Promise<{ success: boolean; orderIds: string[] }> {
+  async execute(
+    command: SagaCreateOrdersCommand,
+  ): Promise<{ success: boolean; orderIds: string[] }> {
     const { userId, orders: orderDatas } = command
 
     const orders = orderDatas.map(data =>
@@ -48,7 +50,7 @@ export class SagaCreateOrdersHandler implements ICommandHandler<SagaCreateOrders
           quantity: item.quantity,
           finalPrice: item.price,
         })),
-      })
+      }),
     )
 
     // Sinh QR code cho từng đơn hàng từ order id
@@ -57,14 +59,16 @@ export class SagaCreateOrdersHandler implements ICommandHandler<SagaCreateOrders
     }
 
     // Transaction: tạo nhiều orders + orderItems phải atomic
-    const orderIds = await this.prismaService.transaction(async (tx) => {
+    const orderIds = await this.prismaService.transaction(async tx => {
       const ids = await this.orderRepository.saveMany(orders, tx)
       await this.historyRepository.createMany(
-        orders.map(order => OrderDeliveryHistory.create({
-          orderId: order.id,
-          orderedAt: order.createdAt,
-        })),
-        tx
+        orders.map(order =>
+          OrderDeliveryHistory.create({
+            orderId: order.id,
+            orderedAt: order.createdAt,
+          }),
+        ),
+        tx,
       )
       return ids
     })

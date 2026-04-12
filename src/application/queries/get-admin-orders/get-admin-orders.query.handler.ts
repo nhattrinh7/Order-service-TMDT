@@ -1,7 +1,10 @@
 ﻿import { IQueryHandler, QueryHandler } from '@nestjs/cqrs'
 import { Inject } from '@nestjs/common'
 import { GetAdminOrdersQuery } from './get-admin-orders.query'
-import { type IOrderRepository, ORDER_REPOSITORY } from '~/domain/repositories/order.repository.interface'
+import {
+  type IOrderRepository,
+  ORDER_REPOSITORY,
+} from '~/domain/repositories/order.repository.interface'
 import type { IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
 

@@ -3,7 +3,11 @@ import { Inject, BadRequestException } from '@nestjs/common'
 import { CalculatePriceCommand } from './calculate-price.command'
 import type { IMessagePublisher } from '~/domain/contracts/message-publisher.interface'
 import { MESSAGE_PUBLISHER } from '~/domain/contracts/message-publisher.interface'
-import type { CalculatePriceResponseDto, ShopItemsDto, SummaryDto } from '~/presentation/dtos/calculate-price.dto'
+import type {
+  CalculatePriceResponseDto,
+  ShopItemsDto,
+  SummaryDto,
+} from '~/presentation/dtos/calculate-price.dto'
 import { SHIPPING_FEE_PER_SHOP } from '~/common/constants/constant'
 
 // Types cho validate voucher message
@@ -53,7 +57,9 @@ interface ValidateVoucherRequest {
 }
 
 @CommandHandler(CalculatePriceCommand)
-export class CalculatePriceHandler implements ICommandHandler<CalculatePriceCommand, CalculatePriceResponseDto> {
+export class CalculatePriceHandler
+  implements ICommandHandler<CalculatePriceCommand, CalculatePriceResponseDto>
+{
   constructor(
     @Inject(MESSAGE_PUBLISHER)
     private readonly messagePublisher: IMessagePublisher,
@@ -63,10 +69,9 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
     const { itemsByShop, userId, szoneVoucherId, shopVouchers } = command
 
     // 0. Xóa tất cả bản ghi VoucherUsage RESERVED cũ của user trước khi tạo mới
-    await this.messagePublisher.sendToVoucherService(
-      'cancel.all.reserved.voucher.usages',
-      { userId }
-    )
+    await this.messagePublisher.sendToVoucherService('cancel.all.reserved.voucher.usages', {
+      userId,
+    })
 
     // 1. Thu thập tất cả variant IDs
     const allVariantIds: string[] = []
@@ -80,14 +85,15 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
     const [variantsResponse, shopsResponse] = await Promise.all([
       this.messagePublisher.sendToCatalogService<
         { productVariantIds: string[] },
-        { variants: Array<{ 
-            id: string; 
-            productId: string; 
-            productName: string; 
-            price: number; 
-            sku: string; 
-            image: string | null; 
-            shopId: string; 
+        {
+          variants: Array<{
+            id: string
+            productId: string
+            productName: string
+            price: number
+            sku: string
+            image: string | null
+            shopId: string
             categoryId: string // có lấy categoryId cấp lá từ catalog-service sang nhé
           }>
         }
@@ -102,7 +108,7 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
     const variantsMap = new Map(variantsResponse.variants.map(v => [v.id, v]))
     const shopsMap = new Map(shopsResponse.map(s => [s.id, s]))
 
-    // 3. Kiểm tra các variant gửi lên từ FE có tồn tại trong catalog-service không 
+    // 3. Kiểm tra các variant gửi lên từ FE có tồn tại trong catalog-service không
     // hoặc có tình trạng dữ liệu FE gửi lên nói item A thuộc shop B nhưng check DB thì không phải hay không
     for (const [shopId, items] of Object.entries(itemsByShop)) {
       for (const item of items) {
@@ -117,20 +123,23 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
     }
 
     // 4. Phase 1: Tính shopSubtotal và chuẩn bị data cho từng shop TRƯỚC
-    const shopDataMap = new Map<string, {
-      shopSubtotal: number
-      shopItems: Array<{
-        id: string
-        productId: string
-        productVariantId: string
-        name: string
-        price: number
-        quantity: number
-        image: string
-        sku: string
-      }>
-      items: typeof itemsByShop[string]
-    }>()
+    const shopDataMap = new Map<
+      string,
+      {
+        shopSubtotal: number
+        shopItems: Array<{
+          id: string
+          productId: string
+          productVariantId: string
+          name: string
+          price: number
+          quantity: number
+          image: string
+          sku: string
+        }>
+        items: (typeof itemsByShop)[string]
+      }
+    >()
 
     for (const [shopId, items] of Object.entries(itemsByShop)) {
       let shopSubtotal = 0
@@ -206,21 +215,22 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
         if (validationResult && validationResult.valid && validationResult.voucher) {
           // shop voucher lấy về từ voucher service
           const voucher = validationResult.voucher
-          
+
           // Tính applicableSubtotal dựa trên scope của voucher
           // applicableSubtotal là tổng giá trị của những items được áp dụng voucher
           let applicableSubtotal = shopSubtotal
           if (voucher.scope === 'PRODUCT' && voucher.applicableProductIds) {
-
             // Chỉ tính subtotal của những products được áp dụng voucher
             applicableSubtotal = items
-              .filter(item => { // kiểm tra productId có nằm trong danh sách productId được áp dụng voucher không
+              .filter(item => {
+                // kiểm tra productId có nằm trong danh sách productId được áp dụng voucher không
                 const variant = variantsMap.get(item.productVariantId)!
                 return voucher.applicableProductIds!.includes(variant.productId)
               })
-              .reduce((sum, item) => { // Tính tổng giá trị từ danh sách items đã lọc
+              .reduce((sum, item) => {
+                // Tính tổng giá trị từ danh sách items đã lọc
                 const variant = variantsMap.get(item.productVariantId)!
-                return sum + (variant.price * item.quantity)
+                return sum + variant.price * item.quantity
               }, 0)
           }
           // Nếu scope = 'ALL', applicableSubtotal = shopSubtotal
@@ -229,7 +239,8 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
           // Tính discount dựa trên applicableSubtotal
           if (voucher.discountType === 'FIXED') {
             shopVoucherDiscount = Math.min(voucher.discountValue, applicableSubtotal)
-          } else { // Loại PERCENT
+          } else {
+            // Loại PERCENT
             shopVoucherDiscount = Math.floor((applicableSubtotal * voucher.discountValue) / 100)
             if (voucher.maxDiscountValue) {
               shopVoucherDiscount = Math.min(shopVoucherDiscount, voucher.maxDiscountValue)
@@ -241,7 +252,7 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
             this.messagePublisher.sendToVoucherService('reserve.voucher.usage', {
               voucherId,
               userId,
-            })
+            }),
           )
         }
       }
@@ -276,25 +287,25 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
             productVariantId: item.productVariantId,
             quantity: item.quantity,
           }
-        })
+        }),
       )
 
-      const validationResult = await this.messagePublisher.sendToVoucherService<ValidateVoucherRequest, ValidateVoucherResult>(
-        'validate.voucher',
-        {
-          voucherId: szoneVoucherId,
-          userId,
-          orderValue: totalSubtotal,
-          items: allItems.map(item => ({
-            productId: item.productId,
-            categoryId: item.categoryId,
-          })),
-        }
-      )
+      const validationResult = await this.messagePublisher.sendToVoucherService<
+        ValidateVoucherRequest,
+        ValidateVoucherResult
+      >('validate.voucher', {
+        voucherId: szoneVoucherId,
+        userId,
+        orderValue: totalSubtotal,
+        items: allItems.map(item => ({
+          productId: item.productId,
+          categoryId: item.categoryId,
+        })),
+      })
 
       if (validationResult.valid && validationResult.voucher) {
         const voucher = validationResult.voucher
-        
+
         // Tính applicableSubtotal dựa trên scope của voucher
         let applicableSubtotal = totalSubtotal
         if (voucher.scope === 'CATEGORY' && voucher.applicableCategoryIds) {
@@ -306,8 +317,8 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
             })
             .reduce((sum, item) => {
               const variant = variantsMap.get(item.productVariantId)!
-              return sum + (variant.price * item.quantity)
-            }, 0)  
+              return sum + variant.price * item.quantity
+            }, 0)
         }
         // Nếu scope = 'ALL', applicableSubtotal = totalSubtotal
         // Note: Szone voucher không có scope PRODUCT
@@ -315,7 +326,8 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
         // Tính discount dựa trên applicableSubtotal (trước khi trừ shop discount)
         if (voucher.discountType === 'FIXED') {
           szoneVoucherDiscount = Math.min(voucher.discountValue, applicableSubtotal)
-        } else { // Loại PERCENT
+        } else {
+          // Loại PERCENT
           szoneVoucherDiscount = Math.floor((applicableSubtotal * voucher.discountValue) / 100)
           if (voucher.maxDiscountValue) {
             szoneVoucherDiscount = Math.min(szoneVoucherDiscount, voucher.maxDiscountValue)
@@ -327,7 +339,7 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
           this.messagePublisher.sendToVoucherService('reserve.voucher.usage', {
             voucherId: szoneVoucherId,
             userId,
-          })
+          }),
         )
       }
     }
@@ -338,7 +350,8 @@ export class CalculatePriceHandler implements ICommandHandler<CalculatePriceComm
     }
 
     // 9. Tính tổng giá cuối cùng
-    const finalPrice = totalSubtotal + totalShippingFee - totalShopVoucherDiscount - szoneVoucherDiscount
+    const finalPrice =
+      totalSubtotal + totalShippingFee - totalShopVoucherDiscount - szoneVoucherDiscount
     const goodsPrice = totalSubtotal - totalShopVoucherDiscount - szoneVoucherDiscount
 
     const summary: SummaryDto = {

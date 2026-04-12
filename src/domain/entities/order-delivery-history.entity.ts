@@ -12,10 +12,7 @@ export class OrderDeliveryHistory {
     public shipper: any | null,
   ) {}
 
-  static create(data: {
-    orderId: string
-    orderedAt: Date
-  }): OrderDeliveryHistory {
+  static create(data: { orderId: string; orderedAt: Date }): OrderDeliveryHistory {
     return new OrderDeliveryHistory(
       uuidv4(),
       data.orderId,

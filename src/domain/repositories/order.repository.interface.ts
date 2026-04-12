@@ -85,9 +85,7 @@ export interface IOrderRepository {
     returnStatus?: OrderItemReturnStatus,
   ): Promise<OrderWithItems[]>
 
-  findOrderItemByIdWithOrder(
-    orderItemId: string,
-  ): Promise<{
+  findOrderItemByIdWithOrder(orderItemId: string): Promise<{
     id: string
     returnStatus: OrderItemReturnStatus
     finalPrice: number
@@ -95,9 +93,6 @@ export interface IOrderRepository {
     order: { userId: string; status: OrderStatus }
   } | null>
 
-  updateOrderItemReturnRequest(
-    orderItemId: string,
-    returnReason: string,
-  ): Promise<void>
+  updateOrderItemReturnRequest(orderItemId: string, returnReason: string): Promise<void>
 }
 export const ORDER_REPOSITORY = Symbol('IOrderRepository')

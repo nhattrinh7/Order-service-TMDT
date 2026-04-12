@@ -56,9 +56,10 @@ export class Order extends AggregateRoot {
       finalPrice: number
     }>
   }): Order {
-    const initialStatus = data.paymentMethod === OrderPaymentMethod.COD
-      ? OrderStatus.AWAITING_CONFIRMATION
-      : OrderStatus.PENDING_PAYMENT
+    const initialStatus =
+      data.paymentMethod === OrderPaymentMethod.COD
+        ? OrderStatus.AWAITING_CONFIRMATION
+        : OrderStatus.PENDING_PAYMENT
 
     const orderItems = data.items.map(item => OrderItem.create(item))
 
@@ -96,4 +97,3 @@ export class Order extends AggregateRoot {
     this.updatedAt = new Date()
   }
 }
-

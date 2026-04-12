@@ -20,17 +20,14 @@ export class WarehouseRepository implements IWarehouseRepository {
   async findByScannerIdOrName(scannerId: string, name: string) {
     return this.prisma.transitWarehouse.findFirst({
       where: {
-        OR: [
-          { scannerId },
-          { name },
-        ],
+        OR: [{ scannerId }, { name }],
       },
       select: {
         id: true,
         scannerId: true,
         name: true,
         address: true,
-      }
+      },
     })
   }
 

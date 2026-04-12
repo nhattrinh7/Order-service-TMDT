@@ -5,7 +5,6 @@ import { RabbitMQPublisher } from '~/infrastructure/messaging/publishers/rabbitm
 import { CqrsModule } from '@nestjs/cqrs'
 import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-order.consumer'
 
-
 @Module({
   imports: [
     CqrsModule,
@@ -75,9 +74,7 @@ import { SagaOrderConsumer } from '~/infrastructure/messaging/consumers/saga-ord
       },
     ]),
   ],
-  controllers: [
-    SagaOrderConsumer,
-  ],
+  controllers: [SagaOrderConsumer],
   providers: [
     {
       provide: MESSAGE_PUBLISHER,

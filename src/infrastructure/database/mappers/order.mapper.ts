@@ -1,5 +1,8 @@
-
-import { Order as PrismaOrder, OrderStatus as PrismaOrderStatus, OrderPaymentMethod as PrismaOrderPaymentMethod } from '@prisma/client'
+import {
+  Order as PrismaOrder,
+  OrderStatus as PrismaOrderStatus,
+  OrderPaymentMethod as PrismaOrderPaymentMethod,
+} from '@prisma/client'
 import { Order } from '~/domain/entities/order.entity'
 import { OrderItem } from '~/domain/entities/order-item.entity'
 import { OrderStatus, OrderPaymentMethod } from '~/domain/enums/order.enum'
@@ -43,9 +46,9 @@ export class OrderMapper {
         returnStatus: item.returnStatus,
         returnRequestedAt: item.returnRequestedAt,
         returnResolvedAt: item.returnResolvedAt,
-      });
-      (orderItem as any).props.id = item.id;
-      return orderItem;
+      })
+      ;(orderItem as any).props.id = item.id
+      return orderItem
     })
 
     const order = this.toDomain(prismaOrder)
@@ -64,7 +67,7 @@ export class OrderMapper {
       shippingAddress: order.shippingAddress,
       receiverName: order.receiverName,
       receiverPhoneNumber: order.receiverPhoneNumber,
-      subtotal: order.subtotal, 
+      subtotal: order.subtotal,
       shippingFee: order.shippingFee,
       szoneVoucherDiscount: order.szoneVoucherDiscount,
       shopVoucherDiscount: order.shopVoucherDiscount,

@@ -20,7 +20,8 @@ export class SagaOrderConsumer extends BaseRetryConsumer {
 
   @EventPattern('saga.create-orders')
   async handleCreateOrders(
-    @Payload() data: {
+    @Payload()
+    data: {
       sagaId: string
       userId: string
       paymentMethod: string

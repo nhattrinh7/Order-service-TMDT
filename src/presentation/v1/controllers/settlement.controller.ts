@@ -5,9 +5,7 @@ import { GetShopSettlementsQueryDto } from '~/presentation/dtos/get-shop-settlem
 
 @Controller('v1/settlements')
 export class SettlementController {
-  constructor(
-    private readonly queryBus: QueryBus,
-  ) {}
+  constructor(private readonly queryBus: QueryBus) {}
 
   @Get('shop/:shopId')
   async getShopSettlements(
