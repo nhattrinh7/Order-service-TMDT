@@ -34,56 +34,56 @@ export class RabbitMQPublisher implements IMessagePublisher {
   }
 
   publish<T>(pattern: string, event: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → notification-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → notification-service`)
     this.notificationClient.emit(pattern, this.buildRecord(event))
   }
 
   emitToSagaOrchestrator<T>(pattern: string, event: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → saga-orchestrator`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → saga-orchestrator`)
     this.sagaClient.emit(pattern, this.buildRecord(event))
   }
 
   emitToUserService<T>(pattern: string, event: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → user-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → user-service`)
     this.userClient.emit(pattern, this.buildRecord(event))
   }
 
   emitToCatalogService<T>(pattern: string, event: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} → catalog-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} → catalog-service`)
     this.catalogClient.emit(pattern, this.buildRecord(event))
   }
 
   emitToInventoryService<T>(pattern: string, event: T): void {
-    this.logger.debug(`[${getKongRequestId()}] Emit ${pattern} -> inventory-service`)
+    this.logger.log(`[${getKongRequestId()}] Emit ${pattern} -> inventory-service`)
     this.inventoryClient.emit(pattern, this.buildRecord(event))
   }
 
   async sendToUserService<T, R = any>(pattern: string, data: T): Promise<R> {
-    this.logger.debug(`[${getKongRequestId()}] Send ${pattern} → user-service`)
+    this.logger.log(`[${getKongRequestId()}] Send ${pattern} → user-service`)
     const response$ = this.userClient.send<R, T>(pattern, this.buildRecord(data) as any)
     return lastValueFrom(response$)
   }
 
   async sendToShopService<T, R = any>(pattern: string, data: T): Promise<R> {
-    this.logger.debug(`[${getKongRequestId()}] Send ${pattern} → shop-service`)
+    this.logger.log(`[${getKongRequestId()}] Send ${pattern} → shop-service`)
     const response$ = this.shopClient.send<R, T>(pattern, this.buildRecord(data) as any)
     return lastValueFrom(response$)
   }
 
   async sendToCatalogService<T, R = any>(pattern: string, data: T): Promise<R> {
-    this.logger.debug(`[${getKongRequestId()}] Send ${pattern} → catalog-service`)
+    this.logger.log(`[${getKongRequestId()}] Send ${pattern} → catalog-service`)
     const response$ = this.catalogClient.send<R, T>(pattern, this.buildRecord(data) as any)
     return lastValueFrom(response$)
   }
 
   async sendToInventoryService<T, R = any>(pattern: string, data: T): Promise<R> {
-    this.logger.debug(`[${getKongRequestId()}] Send ${pattern} -> inventory-service`)
+    this.logger.log(`[${getKongRequestId()}] Send ${pattern} -> inventory-service`)
     const response$ = this.inventoryClient.send<R, T>(pattern, this.buildRecord(data) as any)
     return lastValueFrom(response$)
   }
 
   async sendToVoucherService<T, R = any>(pattern: string, data: T): Promise<R> {
-    this.logger.debug(`[${getKongRequestId()}] Send ${pattern} → voucher-service`)
+    this.logger.log(`[${getKongRequestId()}] Send ${pattern} → voucher-service`)
     const response$ = this.voucherClient.send<R, T>(pattern, this.buildRecord(data) as any)
     return lastValueFrom(response$)
   }
