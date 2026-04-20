@@ -48,23 +48,7 @@ export class CancelOrderHandler implements ICommandHandler<CancelOrderCommand> {
     // 4. Cập nhật trạng thái sang CANCELLED và lưu lý do
     await this.orderRepository.updateStatus(orderId, OrderStatus.CANCELLED, cancelReason)
 
-    // 5. Giảm buy_count ở catalog-service
-    const quantities = new Map<string, number>()
-    for (const item of order.orderItems) {
-      const current = quantities.get(item.productId) ?? 0
-      quantities.set(item.productId, current + item.quantity)
-    }
-    const items = Array.from(quantities.entries()).map(([productId, quantity]) => ({
-      productId,
-      quantity,
-    }))
-
-    if (items.length > 0) {
-      this.messagePublisher.emitToCatalogService('order.decrease-buy-count', {
-        orderId,
-        items,
-      })
-    }
+    // 5. [Việc trừ buy_count trong ES đã được quản lý tự động bởi CDC từ Inventory-service]
 
     // 6. Hoàn tiền vào ví nếu đơn đã thanh toán online (QRCODE hoặc WALLET)
     if (
