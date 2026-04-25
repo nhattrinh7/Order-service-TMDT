@@ -68,10 +68,12 @@ export class GetUserOrdersHandler implements IQueryHandler<GetUserOrdersQuery> {
       returnStatus,
       cursorTimestamp,
       cursorId,
-      limit + 1,
+      limit + 1, // lấy thừa ra 1 bản ghi để kiểm tra có còn trang sau không
     )
 
+    // nếu length > limit tức là còn trang sau
     const hasMore = orders.length > limit
+    // biết là còn trang sau là dc rồi, giờ cắt bỏ bản ghi thừa đi để trả dữ liệu về đúng limit thôi
     const resultOrders = hasMore ? orders.slice(0, limit) : orders
 
     // Lấy shopName từ shop-service
